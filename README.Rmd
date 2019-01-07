@@ -1,0 +1,82 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# Castor API R Package
+The intent of this package is to provide convenient access to study data in Castor via R.
+
+## Package Structure
+Access to data in the API comes in three forms:
+
+1. Access to individual items (getStudyDataPoint, getStudy, getRecord, etc.)
+2. Access to pages of items in a list (getStudyDataPoints, getStudies, getRecords, etc.)
+3. Processed into a data frame for straightforward analysis (getStudyData)
+
+## Installation
+
+```r
+# install.packages("remotes")
+remotes::install_github("castoredc/castoRedc")
+```
+
+## Usage
+
+See [https://helpdesk.castoredc.com/article/124-application-programming-interface-api](https://helpdesk.castoredc.com/article/124-application-programming-interface-api) about generating your credentials.  
+
+_Note: It is recommended that you read [https://cran.r-project.org/web/packages/httr/vignettes/secrets.html](https://cran.r-project.org/web/packages/httr/vignettes/secrets.html) about managing your credentials._  
+
+```{r example}
+library(castoRedc)
+
+castor_api <- CastorData$new(key = Sys.getenv("CASTOR_KEY_DEV"), 
+                             secret = Sys.getenv("CASTOR_SECRET_DEV"), 
+                             base_url = "https://dev.do.castoredc.com")
+```
+
+
+```{r message=FALSE}
+studies <- castor_api$getStudies()
+```
+```{r echo=FALSE, results='asis'}
+knitr::kable(studies)
+```
+
+
+```{r message=FALSE}
+(example_study_id <- studies[["study_id"]][1])
+```
+
+
+```{r message=FALSE}
+fields <- castor_api$getFields(example_study_id)
+```
+```{r echo=FALSE, results='asis'}
+knitr::kable(head(subset(fields, select = -field_summary_template), 3))
+```
+
+
+```{r message=FALSE}
+steps <- castor_api$getSteps(example_study_id)
+```
+```{r echo=FALSE, results='asis'}
+knitr::kable(steps)
+```
+
+
+```{r message=FALSE}
+phases <- castor_api$getPhases(example_study_id)
+```
+```{r echo=FALSE, results='asis'}
+knitr::kable(phases)
+```
+

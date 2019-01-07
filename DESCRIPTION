@@ -1,0 +1,33 @@
+Package: castoRedc
+Title: Wraps Castor API for easy data access
+Version: 0.3
+Authors@R: c(
+    person("Thomas", "Johnson", role = c("aut")),
+    person("Aur\u00e8le", "Morvan", email = "aurele.morvan@castoredc.com", 
+           role = "cre", comment = "Maintainer"),
+    person("Castor EDC", role = "cph")
+    )
+Description: A package that wraps a few of the endpoints for the Castor API.
+Depends: R (>= 3.1.0)
+License: MIT + file LICENSE
+URL: https://github.com/castoredc/castoRedc
+BugReports: https://github.com/castoredc/castoRedc/issues
+LazyData: true
+Imports:
+    httpuv,
+    httr,
+    jsonlite,
+    R6,
+    purrr,
+    dplyr,
+    tidyr,
+    glue
+Suggests:
+    knitr,
+    testthat
+RoxygenNote: 6.1.1
+Collate: 
+    'imports.R'
+    'utils.R'
+    'CastorData.R'
+    'CastorAPIWrapper.R'
