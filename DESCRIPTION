@@ -3,7 +3,7 @@ Title: Wraps Castor API for easy data access
 Version: 0.3
 Authors@R: c(
     person("Thomas", "Johnson", role = c("aut")),
-    person("Aur\u00e8le", "Morvan", email = "aurele.morvan@castoredc.com", 
+    person("Aurele", "Morvan", email = "aurele.morvan@castoredc.com", 
            role = "cre", comment = "Maintainer"),
     person("Castor EDC", role = "cph")
     )
