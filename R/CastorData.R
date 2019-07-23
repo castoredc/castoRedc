@@ -266,7 +266,7 @@ CastorData <- R6::R6Class("CastorData",
                          "_embedded.report.description",
                          "_embedded.report.type")
 
-      name_map <- list(
+      name_map <- c(
         "id" = "report_instance_id",
         "name" = "report_instance_name",
         "status" = "report_instance_status",
