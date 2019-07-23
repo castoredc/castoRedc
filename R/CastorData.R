@@ -66,10 +66,10 @@ CastorData <- R6::R6Class("CastorData",
 
       private$mergePages(phases_pages, "phases")
     },
-    getSurveys = function(study_id,
+    getSurveys = function(study_id, include = "steps",
                           page = NULL) {
       if (self$verbose) message("Getting all surveys for study ", study_id)
-      surveys_pages <- self$getSurveysPages(study_id)
+      surveys_pages <- self$getSurveysPages(study_id, include = include)
 
 
       private$mergePages(surveys_pages, "surveys")

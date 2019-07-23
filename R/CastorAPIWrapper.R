@@ -259,11 +259,11 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
      study <- self$getRequest(paste0("study/", study_id, "/survey/", survey_id))
      return(study)
    },
-   getSurveysPages = function(study_id, page = NULL) {
+   getSurveysPages = function(study_id, include = "steps", page = NULL) {
      # Returns a list pages for of surveys for a given study.
      surveys_url <- paste0("study/", study_id, "/survey")
      surveys <- self$collectPages(surveys_url,
-                                  page = page)
+                                  page = page, include = include)
      return(surveys)
    },
    getSurveyPackage = function(study_id, surveypackage_id) {
