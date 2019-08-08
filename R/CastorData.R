@@ -249,7 +249,7 @@ CastorData <- R6::R6Class("CastorData",
       report_data <- rename_at(report_data,
                                vars(-Record_ID, -report_inst_name,
                                     -report_name, -created_on),
-                               ~id_to_field_name_[.])
+                               ~unlist(id_to_field_name_)[.])
 
       attr(report_data, "report_inst_name_to_id") <- report_inst_name_to_id
       attr(report_data, "report_fields") <- report_fields
