@@ -162,7 +162,7 @@ CastorData <- R6::R6Class("CastorData",
       rename_at(study_data,
                 vars(-Record_ID, -Record_Creation, -Randomization_Group,
                      -Institute_Abbreviation),
-                ~id_to_field_name_[.])
+                ~unlist(id_to_field_name_, recursive = FALSE)[.])
 
     },
     getStudyDataPointsBulk = function(study_id_ = FALSE) {
@@ -241,6 +241,14 @@ CastorData <- R6::R6Class("CastorData",
       if (is.null(id_to_field_name_)) {
         fields <- self$getFields(study_id_)
 
+        fields <-
+          fields %>%
+          mutate(field_variable_name = if_else(
+            is.na(field_variable_name) | field_variable_name == "",
+            paste(substr(field_label, 1, 64), "|", substr(field_id, 1, 8)),
+            field_variable_name
+          ))
+
         fields <- fields[!is.na(fields$field_variable_name), ]
 
         id_to_field_name_ <- split(fields$field_variable_name, fields$field_id)
@@ -249,7 +257,7 @@ CastorData <- R6::R6Class("CastorData",
       report_data <- rename_at(report_data,
                                vars(-Record_ID, -report_inst_name,
                                     -report_name, -created_on),
-                               ~unlist(id_to_field_name_)[.])
+                               ~unlist(id_to_field_name_, recursive = FALSE)[.])
 
       attr(report_data, "report_inst_name_to_id") <- report_inst_name_to_id
       attr(report_data, "report_fields") <- report_fields
@@ -318,7 +326,7 @@ CastorData <- R6::R6Class("CastorData",
 
       if (!is.null(id_to_field_name_))
         rename_at(survey_data, vars(-Record_ID, -package_name),
-                  ~id_to_field_name_[.])
+                  ~unlist(id_to_field_name_, recursive = FALSE)[.])
       else
         survey_data
     },
