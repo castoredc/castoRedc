@@ -28,11 +28,14 @@ remotes::install_github("castoredc/castoRedc")
 
 See
 <https://helpdesk.castoredc.com/article/124-application-programming-interface-api>
-about generating your credentials.
+about generating your credentials.  
 
-*Note: It is recommended that you read
-<https://cran.r-project.org/web/packages/httr/vignettes/secrets.html>
-about managing your credentials.*
+**Please note that the Client ID and Secret grant the same access to your data
+as your own username and password. Please treat them as such and do not hand
+them out to anyone else.**  
+
+We recommend reading about [securely managing your
+credentials](https://cran.r-project.org/web/packages/httr/vignettes/secrets.html).
 
 ``` r
 library(castoRedc)
