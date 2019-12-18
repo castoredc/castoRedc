@@ -190,7 +190,8 @@ CastorData <- R6::R6Class("CastorData",
     },
     getReportInstancesBulk = function(study_id_,
                                       record_id_ = NULL,
-                                      id_to_field_name_ = NULL) {
+                                      id_to_field_name_ = NULL,
+                                      page_size = NULL) {
       if (!is.null(record_id_)) {
         report_instances <- self$getReportInstancesByRecord(
           study_id = study_id_, record_id = record_id_)
@@ -199,7 +200,8 @@ CastorData <- R6::R6Class("CastorData",
                        "/report-instance")
 
         report_instances <- private$mergePages(
-          self$collectPages(ri_url, page_size = 5000),
+          self$collectPages(ri_url, page_size = page_size,
+                            enable_pagination = "true"),
           "items")
       }
 
