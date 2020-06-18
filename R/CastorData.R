@@ -450,7 +450,9 @@ CastorData <- R6::R6Class("CastorData",
         mutate(fields,
                field_variable_name = if_else(is.na(field_variable_name) |
                                                field_variable_name == "<NA>",
-                                             field_id, field_variable_name))
+                                             field_id,
+                                             as.character(field_variable_name))
+               )
       else
         NULL
     },
