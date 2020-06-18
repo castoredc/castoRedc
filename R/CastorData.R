@@ -190,7 +190,8 @@ CastorData <- R6::R6Class("CastorData",
     },
     getReportInstancesBulk = function(study_id_,
                                       record_id_ = NULL,
-                                      id_to_field_name_ = NULL) {
+                                      id_to_field_name_ = NULL,
+                                      page_size = NULL) {
       if (!is.null(record_id_)) {
         report_instances <- self$getReportInstancesByRecord(
           study_id = study_id_, record_id = record_id_)
@@ -199,7 +200,8 @@ CastorData <- R6::R6Class("CastorData",
                        "/report-instance")
 
         report_instances <- private$mergePages(
-          self$collectPages(ri_url, page_size = 5000),
+          self$collectPages(ri_url, page_size = page_size,
+                            enable_pagination = "true"),
           "items")
       }
 
@@ -659,13 +661,12 @@ CastorData <- R6::R6Class("CastorData",
       if (is.null(checkbox_fields))
         checkbox_fields <- self$generateCheckboxFields(field_info)
 
-      if (is.null(checkbox_fields))
+      checkbox_vars <- intersect(names(checkbox_fields), names(datapoints))
+      if (is.null(checkbox_fields) || length(checkbox_vars) == 0)
         return(datapoints)
       else {
-        checkbox_vars <- intersect(names(checkbox_fields), names(datapoints))
         checkbox_data <- split_checkboxes(datapoints[checkbox_vars],
                                           checkbox_field_info = checkbox_fields)
-
         adjusted_data_points <- bind_cols(
           select(datapoints, -one_of(checkbox_vars)),
           checkbox_data)
@@ -683,7 +684,7 @@ CastorData <- R6::R6Class("CastorData",
       field_metadata <- filter(field_metadata,
                                field_variable_name %in% names(study_data))
 
-      for(type in names(type_to_func)) {
+      for (type in names(type_to_func)) {
         fields <- pull(filter(field_metadata, field_type == type),
                        field_variable_name)
 

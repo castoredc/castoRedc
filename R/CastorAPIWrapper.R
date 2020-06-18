@@ -101,8 +101,7 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
 
      self$oauth_token <- castor_token
    },
-   getRequest = function(req_path, query_data = list(page_size = 1000),
-                         raw = FALSE) {
+   getRequest = function(req_path, query_data = list(), raw = FALSE) {
       api_req_path <- paste0("api/", req_path)
       if (self$verbose) message("Getting ", file.path(self$base_url, req_path))
 
@@ -166,22 +165,23 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
       return(result)
    },
    collectPages = function(request_url, page = NULL, include = NULL,
-                           page_size = 1000) {
+                           page_size = NULL, ...) {
      if (!is.null(page)) {
        if (page %% 1 != 0)
          stop(sprintf("page must be an integer. `%s` is not an integer.",
                       page))
      }
+#
+#      if (page_size %% 1 != 0)
+#        stop(sprintf("page_size must be an integer. `%s` is not an integer.",
+#                     page))
 
-     if (page_size %% 1 != 0)
-       stop(sprintf("page_size must be an integer. `%s` is not an integer.",
-                    page))
+     query_params <- list(...)
+     query_params$page_size <- page_size
+     query_params$page <- page
+     query_params$include <- include
 
-     query_data_ <- keep(list(page_size = page_size, page = page,
-                              include = include),
-                         ~!is.null(.x))
-
-     pages <- list(self$getRequest(request_url, query_data = query_data_))
+     pages <- list(self$getRequest(request_url, query_data = query_params))
 
      if (is.null(pages[[1]]$page_count))
        page_count <- 1
@@ -199,14 +199,16 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
 
      # Get other pages and append them to the list.
      if (page_count > 1 & is.null(page)) {
-       pages <- c(pages,
-                  lapply(seq(2, page_count), function(pagenum) {
-                      self$getRequest(request_url,
-                                      query_data = list(page = pagenum,
-                                                        page_size = page_size,
-                                                        include = include))
-                    })
-                 )
+       pages <- c(
+         pages,
+         lapply(
+           seq(2, page_count),
+           function(pagenum) {
+             query_params$page <- pagenum
+             self$getRequest(request_url, query_data = query_params)
+           }
+         )
+       )
      }
 
      return(pages)
