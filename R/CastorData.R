@@ -246,9 +246,9 @@ CastorData <- R6::R6Class("CastorData",
         fields <-
           fields %>%
           mutate(field_variable_name = if_else(
-            is.na(field_variable_name) | field_variable_name == "",
+            is.na(field_variable_name) | isTRUE(field_variable_name == ""),
             paste(substr(field_label, 1, 64), "|", substr(field_id, 1, 8)),
-            field_variable_name
+            as.character(field_variable_name)
           ))
 
         fields <- fields[!is.na(fields$field_variable_name), ]
