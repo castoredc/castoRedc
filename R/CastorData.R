@@ -327,7 +327,8 @@ CastorData <- R6::R6Class("CastorData",
         package_name = survey_name)
 
       if (!is.null(id_to_field_name_))
-        rename_at(survey_data, vars(-Record_ID, -package_name),
+        rename_at(survey_data, vars(-Record_ID, -package_name,
+                                    -survey_instance_id),
                   ~unlist(id_to_field_name_, recursive = FALSE)[.])
       else
         survey_data
