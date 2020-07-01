@@ -3,6 +3,10 @@ NULL
 
 #' @importFrom stats setNames
 split_checkbox <- function(values, field_info, sep_ = ";") {
+  cat("checkbox values:\n")
+  print(values)
+  cat("checkbox field info:\n")
+  print(field_info)
   num_vals <- length(values)
   if (num_vals > 0) {
     values <- strsplit(values, sep_)
