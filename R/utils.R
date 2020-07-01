@@ -4,13 +4,18 @@ NULL
 #' @importFrom stats setNames
 split_checkbox <- function(values, field_info, sep_ = ";") {
   num_vals <- length(values)
-  values <- strsplit(values, sep_)
-  values <- lapply(values, function(values_) {
-    if (length(values_) == 0)
-      NA
-    else
-      values_
-  })
+  if (num_vals > 0) {
+    values <- strsplit(values, sep_)
+    values <- lapply(values, function(values_) {
+      if (length(values_) == 0)
+        NA
+      else
+        values_
+    })
+  } else {
+    values <- rep(NA, num_vals)
+  }
+
   field <- names(field_info)
 
   checkbox_result <- rename_all(
