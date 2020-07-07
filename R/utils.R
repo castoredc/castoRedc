@@ -45,7 +45,14 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
       setNames(list(rep(FALSE, num_vals)), pad_field)
     })
   )
-
+  
+  cat("checkbox_result:\n")
+  print(checkbox_result)
+  cat("\n\nempty_checkboxes:\n")
+  print(empty_checkboxes)
+  cat("\n\nfield_info[[field]]:\n")
+  print(field_info[[field]])
+  
   select(
     bind_cols(checkbox_result, empty_checkboxes),
   one_of(field_info[[field]]))
