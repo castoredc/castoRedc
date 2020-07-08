@@ -38,7 +38,7 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
   pad_fields <- setdiff(field_info[[field]], names(checkbox_result))
   empty_checkboxes <- bind_cols(
     map(pad_fields, function(pad_field) {
-      setNames(list(rep(FALSE, num_vals)), pad_field)
+      setNames(list(rep(FALSE, min(num_vals, 1))), pad_field)
     })
   )
 
