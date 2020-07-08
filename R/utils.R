@@ -46,13 +46,6 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
     })
   )
 
-  cat("checkbox_result:\n")
-  print(checkbox_result)
-  cat("\n\nempty_checkboxes:\n")
-  print(empty_checkboxes)
-  cat("\n\nfield_info[[field]]:\n")
-  print(field_info[[field]])
-
   if (nrow(empty_checkboxes) > 0)
     checkbox_result <- bind_cols(checkbox_result, empty_checkboxes)
 
