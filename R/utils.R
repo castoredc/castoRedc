@@ -3,6 +3,10 @@ NULL
 
 #' @importFrom stats setNames
 split_checkbox <- function(values, field_info, sep_ = ";") {
+  cat("checkbox values:\n")
+  print(values)
+  cat("checkbox field info:\n")
+  print(field_info)
   num_vals <- length(values)
   if (num_vals > 0) {
     values <- strsplit(values, sep_)
@@ -42,9 +46,10 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
     })
   )
 
-  select(
-    bind_cols(checkbox_result, empty_checkboxes),
-  one_of(field_info[[field]]))
+  if (nrow(empty_checkboxes) > 0)
+    checkbox_result <- bind_cols(checkbox_result, empty_checkboxes)
+
+  select(checkbox_result, one_of(field_info[[field]]))
 }
 
 split_checkboxes <- function(checkbox_data, checkbox_field_info, sep = ";") {
