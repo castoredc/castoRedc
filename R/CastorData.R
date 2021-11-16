@@ -541,6 +541,7 @@ CastorData <- R6::R6Class("CastorData",
       arrange(field_metadata, fullstep)
     },
     getStudyData = function(study_id, bulk = TRUE,
+                            study = TRUE,
                             report_instances = FALSE,
                             survey_instances = FALSE,
                             filter_types = c("remark", "image", "summary",
@@ -556,18 +557,22 @@ CastorData <- R6::R6Class("CastorData",
       if (is.null(field_info))
         return(NULL)
 
-      if (bulk) {
-        all_data_points.df <- self$getStudyDataBulk(study_id, field_info,
-                                                    record_metadata)
-      } else {
-        # Get study data from getStudyDataPoints and collect them by record in a
-        # list.
-        study_data <- lapply(record_metadata$record_id, function(record) {
-          if (self$verbose) message("getting record ", record)
-          return(self$getStudyDataPoints(study_id, record, filter_types))
-        })
+      if (study) {
+        if (bulk) {
+          all_data_points.df <- self$getStudyDataBulk(study_id, field_info,
+                                                      record_metadata)
+        } else {
+          # Get study data from getStudyDataPoints and collect them by record in a
+          # list.
+          study_data <- lapply(record_metadata$record_id, function(record) {
+            if (self$verbose) message("getting record ", record)
+            return(self$getStudyDataPoints(study_id, record, filter_types))
+          })
 
-        all_data_points.df <- bind_rows(study_data)
+          all_data_points.df <- bind_rows(study_data)
+        }
+      } else {
+        all_data_points.df <- NULL
       }
 
       if (is.null(all_data_points.df)) {
