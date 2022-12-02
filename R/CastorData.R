@@ -665,7 +665,7 @@ CastorData <- R6::R6Class("CastorData",
         checkbox_map <- pmap(checkboxes, list) %>%
           set_names(map(., "field_variable_name")) %>%
           imap(~paste0(.$field_variable_name, "#",
-                       .$option_group.options$groupOrder))
+                       .$option_group.options$value))
 
         # the above generates duplicates
         checkbox_map[unique(names(checkbox_map))]
