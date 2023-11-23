@@ -22,6 +22,14 @@ NULL
 #'  frame with all data points for a given study with each row representing a
 #'  record and each column a field.
 #'  }
+#'  \item \code{getOptionGroups(study_id): creates a data
+#'  frame with all option groups for a given study with each row representing an
+#'  option group.
+#'  }
+#'  \item \code{getReportInstancesByRecord(study_id, record_id): creates a data
+#'  frame with all repeating data for a given participant with each row
+#'  representing a field.
+#'  }
 #'  \item \code{adjustTypes = function(field_to_type, values,
 #'                                     type_to_func): Utility method
 #'  for casting columns to their intended type. Users can supply their own list
