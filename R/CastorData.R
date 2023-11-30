@@ -22,6 +22,14 @@ NULL
 #'  frame with all data points for a given study with each row representing a
 #'  record and each column a field.
 #'  }
+#'  \item \code{getOptionGroups(study_id): creates a data
+#'  frame with all option groups for a given study with each row representing an
+#'  option group.
+#'  }
+#'  \item \code{getReportInstancesByRecord(study_id, record_id): creates a data
+#'  frame with all repeating data for a given participant with each row
+#'  representing a field.
+#'  }
 #'  \item \code{adjustTypes = function(field_to_type, values,
 #'                                     type_to_func): Utility method
 #'  for casting columns to their intended type. Users can supply their own list
@@ -170,12 +178,17 @@ CastorData <- R6::R6Class("CastorData",
 
       private$mergePages(self$collectPages(sdpb_url, page_size = 5000), "items")
     },
+    getOptionGroups = function(study_id = FALSE) {
+      og_url <- glue("study/{study_id}/field-optiongroup")
+
+      private$mergePages(self$collectPages(og_url, page_size = 1000), "fieldOptionGroups")
+    },
     getReportInstancesByRecord = function(study_id, record_id) {
-      report_url <- glue("study/{study_id}/record/{record_id}",
-                         "/data-point-collection/report-instance")
+      report_url <- glue("study/{study_id}/participant/{record_id}",
+                         "/data-points/repeating-data-instance")
 
       result <- private$mergePages(self$collectPages(report_url,
-                                                     page_size = 5000),
+                                                     page_size = 1000),
                                    "items")
 
       if (nrow(result) > 0)
@@ -196,8 +209,8 @@ CastorData <- R6::R6Class("CastorData",
         report_instances <- self$getReportInstancesByRecord(
           study_id = study_id_, record_id = record_id_)
       } else {
-        ri_url <- glue("study/{study_id_}/data-point-collection",
-                       "/report-instance")
+        ri_url <- glue("study/{study_id_}/data-points",
+                       "/repeating-data-instance")
 
         report_instances <- private$mergePages(
           self$collectPages(ri_url, page_size = page_size,
