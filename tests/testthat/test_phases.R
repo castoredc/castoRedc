@@ -1,7 +1,7 @@
 context("Test Phase related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
-castor_api <- CastorData$new(creds$user, creds$pw)
+castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getPhase returns an appropriate object.", {
   phase <- castor_api$getPhase(creds$example_study, creds$example_phase)

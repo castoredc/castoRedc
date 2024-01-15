@@ -1,7 +1,7 @@
 context("Test Record related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
-castor_api <- CastorData$new(creds$user, creds$pw)
+castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getRecord returns an appropriate object.", {
   record <- castor_api$getRecord(creds$example_study, creds$example_record)

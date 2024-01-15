@@ -1,7 +1,7 @@
 context("Test StudyDataPoint related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
-castor_api <- CastorData$new(creds$user, creds$pw)
+castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getStudyDataPoint returns an appropriate object.", {
   sdp <- castor_api$getStudyDataPoint(creds$example_study,

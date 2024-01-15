@@ -1,7 +1,7 @@
 context("Test Report related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
-castor_api <- CastorData$new(creds$user, creds$pw)
+castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getReport returns an appropriate object.", {
   report <- castor_api$getReport(creds$example_study, creds$example_report)

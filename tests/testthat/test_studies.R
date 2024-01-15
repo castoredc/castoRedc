@@ -1,7 +1,7 @@
 context("Test Study related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
-castor_api <- CastorData$new(creds$user, creds$pw)
+castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getStudy returns an appropriate object.", {
   study <- castor_api$getStudy(creds$example_study)
