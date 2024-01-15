@@ -11,6 +11,8 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+credentials <- readRDS("tests/testthat/testing_credentials.Rds")
 ```
 # Castor API R Package
 The intent of this package is to provide convenient access to study data in Castor via R.
@@ -29,6 +31,13 @@ Access to data in the API comes in three forms:
 remotes::install_github("castoredc/castoRedc")
 ```
 
+## Testing
+
+If you want to test the package, for example when developing, please fill in create_testing_credentials.R.  
+You should supply an example for each of the study, report, etc. 
+Please make sure that the record has a value in the field.
+And that the report step is a child of the report.
+
 ## Usage
 
 See [https://helpdesk.castoredc.com/article/124-application-programming-interface-api](https://helpdesk.castoredc.com/article/124-application-programming-interface-api) about generating your credentials.  
@@ -38,9 +47,9 @@ _Note: It is recommended that you read [https://cran.r-project.org/web/packages/
 ```{r example}
 library(castoRedc)
 
-castor_api <- CastorData$new(key = Sys.getenv("CASTOR_KEY_DEV"), 
-                             secret = Sys.getenv("CASTOR_SECRET_DEV"), 
-                             base_url = "https://dev.do.castoredc.com")
+castor_api <- CastorData$new(key = credentials$client_id, 
+                             secret = credentials$client_secret, 
+                             base_url = "https://data.castoredc.com")
 ```
 
 
