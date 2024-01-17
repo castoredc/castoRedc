@@ -2,9 +2,11 @@ Package: castoRedc
 Title: Wraps Castor API for easy data access
 Version: 1.1.0
 Authors@R: c(
-    person("Thomas", "Johnson", role = c("aut")),
-    person("Aurele", "Morvan", email = "aurele.morvan@castoredc.com",
-           role = "cre", comment = "Maintainer"),
+    person("Thomas", "Johnson", role = "aut"),
+    person("Reinier", "van Linschoten",
+           role = "aut", comment = "Castor Helpdesk"),
+    person("Castor Support", email = "support@castoredc.com",
+           role = "cre", comment = "Castor Helpdesk"),
     person("Castor EDC", role = "cph")
     )
 Description: A package that wraps a few of the endpoints for the Castor API.
