@@ -281,7 +281,7 @@ CastorData <- R6::R6Class("CastorData",
     },
     getRepeatingDataInstanceMetadata = function(study_id) {
       ri_md_pages <- self$getRepeatingDataInstanceMetadataPages(study_id = study_id)
-      ri_metadata <- private$mergePages(ri_md_pages, "repeating_dataInstances")
+      ri_metadata <- private$mergePages(ri_md_pages, "repeatingDataInstance")
 
       selected_cols <- c("id", "name", "status", "parent_id", "parent_type",
                          "participant_id", "repeating_data_name", "created_on",
