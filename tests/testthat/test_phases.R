@@ -1,33 +1,33 @@
-context("Test Phase related methods.")
+context("Test Visit related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
 castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
-test_that("getPhase returns an appropriate object.", {
-  phase <- castor_api$getPhase(creds$example_study, creds$example_phase)
+test_that("getVisit returns an appropriate object.", {
+  visit <- castor_api$getVisit(creds$example_study, creds$example_visit)
 
-  expect_is(phase, "list")
-  expect_equal(phase$phase_id, creds$example_phase)
-  expect_gt(length(phase), 0)
+  expect_is(visit, "list")
+  expect_equal(visit$visit_id, creds$example_visit)
+  expect_gt(length(visit), 0)
 })
 
-test_that("getPhasesPages returns an appropriate object.", {
-  phases <- castor_api$getPhasesPages(creds$example_study)
-  one_phase <- castor_api$getPhasesPages(creds$example_study, page = 1)
+test_that("getVisitsPages returns an appropriate object.", {
+  visits <- castor_api$getVisitsPages(creds$example_study)
+  one_visit <- castor_api$getVisitsPages(creds$example_study, page = 1)
 
-  expect_is(phases, "list")
-  expect_is(one_phase, "list")
-  expect_true(length(one_phase) == 1)
-  expect_error(castor_api$getPhasesPages(creds$example_study, page = -1))
-  expect_error(castor_api$getPhasesPages(creds$example_study, page = 100000000))
-  expect_error(castor_api$getPhasesPages(creds$example_study, page = pi))
+  expect_is(visits, "list")
+  expect_is(one_visit, "list")
+  expect_true(length(one_visit) == 1)
+  expect_error(castor_api$getVisitsPages(creds$example_study, page = -1))
+  expect_error(castor_api$getVisitsPages(creds$example_study, page = 100000000))
+  expect_error(castor_api$getVisitsPages(creds$example_study, page = pi))
 })
 
-test_that("getPhases returns an appropriate object.", {
-  phase_data <- castor_api$getPhases(creds$example_study)
+test_that("getVisits returns an appropriate object.", {
+  visit_data <- castor_api$getVisits(creds$example_study)
 
-  expect_is(phase_data, "data.frame")
-  expect_gt(nrow(phase_data), 0)
-  expect_gt(ncol(phase_data), 0)
-  expect_error(castor_api$getPhases("this is not a study id"))
+  expect_is(visit_data, "data.frame")
+  expect_gt(nrow(visit_data), 0)
+  expect_gt(ncol(visit_data), 0)
+  expect_error(castor_api$getVisits("this is not a study id"))
 })

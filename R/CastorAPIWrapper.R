@@ -12,27 +12,27 @@ NULL
 #'  \item \code{collectPages(request_url, page, include: }
 #'  \item \code{getStudy(study_id): Retrieves information about given study.}
 #'  \item \code{getStudiesPages(): Retries all Castor studies in account.}
-#'  \item \code{getStep(study_id, step_id): Retrieves information about given study.}
-#'  \item \code{getStepsPages(): Retries all Castor studies in account.}
+#'  \item \code{getForm(study_id, form_id): Retrieves information about given study.}
+#'  \item \code{getFormsPages(): Retries all Castor studies in account.}
 #'  \item \code{getField(study_id, field_id, include): Gets a specified
 #'  field.
 #'  }
 #'  \item \code{getFieldsPages(study_id, include, page): Gets all fields pages
 #'  for a given study.
 #'  }
-#'  \item \code{getRecord(study_id, record_id): Gets a specified
-#'  record.
+#'  \item \code{getParticipant(study_id, participant_id): Gets a specified
+#'  participant.
 #'  }
-#'  \item \code{getRecordsPages(study_id: Gets all records for a given
+#'  \item \code{getParticipantPages(study_id: Gets all participants for a given
 #'  study.
 #'  }
-#'  \item \code{getStudyDataPoint(study_id, record_id,
+#'  \item \code{getStudyDataPoint(study_id, participant_id,
 #'                                field_id: Gets an individual data
-#'  point for a given study, record and field.
+#'  point for a given study, participant and field.
 #'  }
-#'  \item \code{getStudyDataPointsPages(study_id, record_id,
+#'  \item \code{getStudyDataPointsPages(study_id, participant_id,
 #'                                      filter_types: Gets all data
-#'  points for a given study and record. Filter types may be supplied for fields
+#'  points for a given study and participant Filter types may be supplied for fields
 #'  types as a character vector of field types.
 #'  }
 #' }
@@ -219,7 +219,7 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
      return(study)
    },
    getStudiesPages = function(page = NULL) {
-     # Returns a list pages for of steps for a given study.
+     # Returns a list pages for of forms for a given study.
      studies_url <- "study"
      studies <- self$collectPages(studies_url,
                                   page = page)
@@ -232,36 +232,36 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
                                 page = page)
      return(users)
    },
-   getStep = function(study_id, step_id) {
+   getForm = function(study_id, form_id) {
      # Returns a single study.
-     study <- self$getRequest(paste0("study/", study_id, "/step/", step_id))
+     study <- self$getRequest(paste0("study/", study_id, "/form/", form_id))
      return(study)
    },
-   getStepsPages = function(study_id, page = NULL) {
-     # Returns a list pages for of steps for a given study.
-     steps_url <- paste0("study/", study_id, "/step")
-     steps <- self$collectPages(steps_url,
+   getFormsPages = function(study_id, page = NULL) {
+     # Returns a list pages for of forms for a given study.
+     forms_url <- paste0("study/", study_id, "/form")
+     forms <- self$collectPages(forms_url,
                                 page = page)
-     return(steps)
+     return(forms)
    },
-   getPhase = function(study_id, phase_id) {
+   getVisit = function(study_id, visit_id) {
      # Returns a single study.
-     study <- self$getRequest(paste0("study/", study_id, "/phase/", phase_id))
+     study <- self$getRequest(paste0("study/", study_id, "/visit/", visit_id))
      return(study)
    },
-   getPhasesPages = function(study_id, page = NULL) {
-     # Returns a list pages for of phases for a given study.
-     phases_url <- paste0("study/", study_id, "/phase")
-     phases <- self$collectPages(phases_url,
+   getVisitsPages = function(study_id, page = NULL) {
+     # Returns a list pages for of visits for a given study.
+     visits_url <- paste0("study/", study_id, "/visit")
+     visits <- self$collectPages(visits_url,
                                  page = page)
-     return(phases)
+     return(visits)
    },
    getSurvey = function(study_id, survey_id) {
      # Returns a single study.
      study <- self$getRequest(paste0("study/", study_id, "/survey/", survey_id))
      return(study)
    },
-   getSurveysPages = function(study_id, include = "steps", page = NULL) {
+   getSurveysPages = function(study_id, include = "forms", page = NULL) {
      # Returns a list pages for of surveys for a given study.
      surveys_url <- paste0("study/", study_id, "/survey")
      surveys <- self$collectPages(surveys_url,
@@ -279,41 +279,41 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
    },
    getSurveyPackageInstance = function(study_id, surveypackageinstance_id) {
      # Returns a single study.
-     req_url <- glue("study/{study_id}/surveypackageinstance/",
+     req_url <- glue("study/{study_id}/survey-package-instance/",
                      "{surveypackageinstance_id}")
      self$getRequest(req_url)
    },
    getSurveyPackageInstancesPages = function(study_id, page = NULL) {
      # Returns a list pages for of surveypackageinstances for a given study.
-     req_url <- glue("study/{study_id}/surveypackageinstance")
+     req_url <- glue("study/{study_id}/survey-package-instance")
      self$collectPages(req_url, page = page)
    },
-   getReport = function(study_id, report_id, include = NULL) {
-     # Returns a single report.
-     self$getRequest(glue("study/{study_id}/report/{report_id}"),
+   getRepeatingData = function(study_id, repeating_data_id, include = NULL) {
+     # Returns a single repeating_data.
+     self$getRequest(glue("study/{study_id}/repeating-data/{repeating_data_id}"),
                      query_data = list(include = include))
    },
-   getReportsPages = function(study_id,
+   getRepeatingDatasPages = function(study_id,
                               include = "optiongroup",
                               page = NULL) {
-     # Gets all reports, with each page going into a list. Returns a list.
-     reports_url <- glue("study/{study_id}/report")
-     self$collectPages(reports_url, page = page, include = include)
+     # Gets all repeating_datas, with each page going into a list. Returns a list.
+     repeating_datas_url <- glue("study/{study_id}/repeating-data")
+     self$collectPages(repeating_datas_url, page = page, include = include)
    },
-   getReportStep = function(study_id, report_id, report_step_id) {
+   getRepeatingDataForm = function(study_id, repeating_data_id, repeating_data_form_id) {
      # Returns a single study.
-     study <- self$getRequest(paste0("study/", study_id, "/report/", report_id,
-                                     "/report-step/", report_step_id))
+     study <- self$getRequest(paste0("study/", study_id, "/repeating-data/", repeating_data_id,
+                                     "/repeating-data-form/", repeating_data_form_id))
      return(study)
    },
-   getReportStepsPages = function(study_id, report_id,
+   getRepeatingDataFormsPages = function(study_id, repeating_data_id,
                                   page = NULL) {
-     # Returns a list pages for of report-steps for a given study.
-     report_steps_url <- paste0("study/", study_id, "/report/", report_id,
-                                "/report-step")
-     report_steps <- self$collectPages(report_steps_url,
+     # Returns a list pages for of repeating-data-forms for a given study.
+     repeating_data_forms_url <- paste0("study/", study_id, "/repeating-data/", repeating_data_id,
+                                "/repeating-data-form")
+     repeating_data_forms <- self$collectPages(repeating_data_forms_url,
                                        page = page)
-     return(report_steps)
+     return(repeating_data_forms)
    },
    getField = function(study_id, field_id, include = NULL) {
      field_url <- glue("study/{study_id}/field/{field_id}")
@@ -323,26 +323,26 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
      fields_url <- glue("study/{study_id}/field")
      self$collectPages(fields_url, page = page, include = include)
    },
-   getRecord = function(study_id, record_id) {
-     record_url <- glue("study/{study_id}/record/{record_id}")
-     self$getRequest(record_url)
+   getParticipant = function(study_id, participant_id) {
+     participant_url <- glue("study/{study_id}/participant/{participant_id}")
+     self$getRequest(participant_url)
    },
-   getRecordsPages = function(study_id, page = NULL) {
-     records_url <- glue("study/{study_id}/record")
-     self$collectPages(records_url, page = page)
+   getParticipantsPages = function(study_id, page = NULL) {
+     participants_url <- glue("study/{study_id}/participant")
+     self$collectPages(participants_url, page = page)
    },
-   getStudyDataPoint = function(study_id, record_id, field_id) {
+   getStudyDataPoint = function(study_id, participant_id, field_id) {
      # Get API response for individual study data point.
-     sdp_url <- glue("study/{study_id}/record/{record_id}/",
+     sdp_url <- glue("study/{study_id}/participant/{participant_id}/",
                      "study-data-point/{field_id}")
      self$getRequest(sdp_url)
    },
-   getStudyDataPointsPages = function(study_id, record_id, page = NULL) {
-     sdp_url <- glue("study/{study_id}/record/{record_id}/study-data-point")
+   getStudyDataPointsPages = function(study_id, participant_id, page = NULL) {
+     sdp_url <- glue("study/{study_id}/participant/{participant_id}/study-data-point")
      self$collectPages(sdp_url, page = page)
    },
-   getReportInstanceMetadataPages = function(study_id, page = NULL) {
-     ri_md_url <- glue("study/{study_id}/report-instance")
+   getRepeatingDataInstanceMetadataPages = function(study_id, page = NULL) {
+     ri_md_url <- glue("study/{study_id}/repeating-data-instance")
      self$collectPages(ri_md_url, page = page)
    }
   ),
