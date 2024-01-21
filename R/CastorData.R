@@ -435,7 +435,7 @@ CastorData <- R6::R6Class("CastorData",
     getStudyDataBulk = function(study_id., field_info., participant_metadata) {
       study_data <- self$getStudyDataPointsBulk(study_id.)
       if (isTRUE(nrow(study_data) > 0)) {
-        study_data_field_info <- distinct(left_join(study_data, field_info.))
+        study_data_field_info <- distinct(left_join(study_data, field_info., by = "field_id"))
         study_data_long <- select(study_data_field_info,
                                   field_variable_name, participant_id, field_value)
         study_data_wide <- spread(study_data_long,
@@ -451,7 +451,8 @@ CastorData <- R6::R6Class("CastorData",
               Randomization_Group = randomization_group,
               Site_Abbreviation = `_embedded.site.abbreviation`,
               Participant_Creation = created_on.date),
-            study_data_compelete_cases
+            study_data_compelete_cases,
+            by="participant_id"
           ),
           Participant_ID = participant_id
         )
@@ -484,8 +485,8 @@ CastorData <- R6::R6Class("CastorData",
                               by.x = "id", by.y = "parent_id", all.y = TRUE)
 
         fields_forms$fullform <-
-          as.integer(paste0(fields_forms$form_order,
-                            sprintf("%02d", fields_forms$field_number)))
+          suppressWarnings(as.integer(paste0(fields_forms$form_order,
+                            sprintf("%02d", fields_forms$field_number))))
       } else {
         fields_forms <- field_info
         fields_forms$fullform <- fields_forms$field_number
@@ -499,7 +500,7 @@ CastorData <- R6::R6Class("CastorData",
                ~tibble(adjusted_field_variable_name = .x,
                        field_variable_name = .y)))
 
-        field_order <- left_join(fields_forms, name_map)
+        field_order <- left_join(fields_forms, name_map, by="field_variable_name")
       } else {
         field_order <- fields_forms
         field_order$adjusted_field_variable_name <-
@@ -539,7 +540,8 @@ CastorData <- R6::R6Class("CastorData",
                                       field_variable_name,
                                       adjusted_field_variable_name,
                                       fullform),
-                               field_info)
+                               field_info,
+                               by = "field_variable_name")
       if (!is.null(forms))
         field_metadata <- merge(field_order, forms,
                                 by.x = "parent_id", by.y = "id",
@@ -752,7 +754,7 @@ CastorData <- R6::R6Class("CastorData",
           print(pages_merged)
         }
       } else {
-        message("Only one page from API to return")
+        # message("Only one page from API to return")
         # Otherwise, just return the data frame from the only page that exists.
         pages_merged <- pages[[1]][[key]][[subkey]]
       }
