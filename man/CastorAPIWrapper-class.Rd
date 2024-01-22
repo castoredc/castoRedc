@@ -5,11 +5,12 @@
 \alias{CastorAPIWrapper-class}
 \alias{CastorAPIWrapper}
 \title{Class used to wrap Castor REST API.}
-\format{An R6 class object.}
-\usage{
-CastorAPIWrapper
+\format{
+An R6 class object.
 }
 \description{
+Class used to wrap Castor REST API.
+
 Class used to wrap Castor REST API.
 }
 \section{Methods}{
@@ -21,30 +22,361 @@ Class used to wrap Castor REST API.
  \item \code{collectPages(request_url, page, include: }
  \item \code{getStudy(study_id): Retrieves information about given study.}
  \item \code{getStudiesPages(): Retries all Castor studies in account.}
- \item \code{getStep(study_id, step_id): Retrieves information about given study.}
- \item \code{getStepsPages(): Retries all Castor studies in account.}
+ \item \code{getForm(study_id, form_id): Retrieves information about given study.}
+ \item \code{getFormsPages(): Retries all Castor studies in account.}
  \item \code{getField(study_id, field_id, include): Gets a specified
  field.
  }
  \item \code{getFieldsPages(study_id, include, page): Gets all fields pages
  for a given study.
  }
- \item \code{getRecord(study_id, record_id): Gets a specified
- record.
+ \item \code{getParticipant(study_id, participant_id): Gets a specified
+ participant.
  }
- \item \code{getRecordsPages(study_id: Gets all records for a given
+ \item \code{getParticipantPages(study_id: Gets all participants for a given
  study.
  }
- \item \code{getStudyDataPoint(study_id, record_id,
+ \item \code{getStudyDataPoint(study_id, participant_id,
                                field_id: Gets an individual data
- point for a given study, record and field.
+ point for a given study, participant and field.
  }
- \item \code{getStudyDataPointsPages(study_id, record_id,
+ \item \code{getStudyDataPointsPages(study_id, participant_id,
                                      filter_types: Gets all data
- points for a given study and record. Filter types may be supplied for fields
+ points for a given study and participant Filter types may be supplied for fields
  types as a character vector of field types.
  }
 }
 }
 
 \keyword{internal}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-CastorAPIWrapper-new}{\code{CastorAPIWrapper$new()}}
+\item \href{#method-CastorAPIWrapper-castorOAuth}{\code{CastorAPIWrapper$castorOAuth()}}
+\item \href{#method-CastorAPIWrapper-getRequest}{\code{CastorAPIWrapper$getRequest()}}
+\item \href{#method-CastorAPIWrapper-collectPages}{\code{CastorAPIWrapper$collectPages()}}
+\item \href{#method-CastorAPIWrapper-getStudy}{\code{CastorAPIWrapper$getStudy()}}
+\item \href{#method-CastorAPIWrapper-getStudiesPages}{\code{CastorAPIWrapper$getStudiesPages()}}
+\item \href{#method-CastorAPIWrapper-getUsersPages}{\code{CastorAPIWrapper$getUsersPages()}}
+\item \href{#method-CastorAPIWrapper-getForm}{\code{CastorAPIWrapper$getForm()}}
+\item \href{#method-CastorAPIWrapper-getFormsPages}{\code{CastorAPIWrapper$getFormsPages()}}
+\item \href{#method-CastorAPIWrapper-getVisit}{\code{CastorAPIWrapper$getVisit()}}
+\item \href{#method-CastorAPIWrapper-getVisitsPages}{\code{CastorAPIWrapper$getVisitsPages()}}
+\item \href{#method-CastorAPIWrapper-getSurvey}{\code{CastorAPIWrapper$getSurvey()}}
+\item \href{#method-CastorAPIWrapper-getSurveysPages}{\code{CastorAPIWrapper$getSurveysPages()}}
+\item \href{#method-CastorAPIWrapper-getSurveyPackage}{\code{CastorAPIWrapper$getSurveyPackage()}}
+\item \href{#method-CastorAPIWrapper-getSurveyPackagesPages}{\code{CastorAPIWrapper$getSurveyPackagesPages()}}
+\item \href{#method-CastorAPIWrapper-getSurveyPackageInstance}{\code{CastorAPIWrapper$getSurveyPackageInstance()}}
+\item \href{#method-CastorAPIWrapper-getSurveyPackageInstancesPages}{\code{CastorAPIWrapper$getSurveyPackageInstancesPages()}}
+\item \href{#method-CastorAPIWrapper-getRepeatingData}{\code{CastorAPIWrapper$getRepeatingData()}}
+\item \href{#method-CastorAPIWrapper-getRepeatingDatasPages}{\code{CastorAPIWrapper$getRepeatingDatasPages()}}
+\item \href{#method-CastorAPIWrapper-getRepeatingDataForm}{\code{CastorAPIWrapper$getRepeatingDataForm()}}
+\item \href{#method-CastorAPIWrapper-getRepeatingDataFormsPages}{\code{CastorAPIWrapper$getRepeatingDataFormsPages()}}
+\item \href{#method-CastorAPIWrapper-getField}{\code{CastorAPIWrapper$getField()}}
+\item \href{#method-CastorAPIWrapper-getFieldsPages}{\code{CastorAPIWrapper$getFieldsPages()}}
+\item \href{#method-CastorAPIWrapper-getParticipant}{\code{CastorAPIWrapper$getParticipant()}}
+\item \href{#method-CastorAPIWrapper-getParticipantsPages}{\code{CastorAPIWrapper$getParticipantsPages()}}
+\item \href{#method-CastorAPIWrapper-getStudyDataPoint}{\code{CastorAPIWrapper$getStudyDataPoint()}}
+\item \href{#method-CastorAPIWrapper-getStudyDataPointsPages}{\code{CastorAPIWrapper$getStudyDataPointsPages()}}
+\item \href{#method-CastorAPIWrapper-getRepeatingDataInstanceMetadataPages}{\code{CastorAPIWrapper$getRepeatingDataInstanceMetadataPages()}}
+\item \href{#method-CastorAPIWrapper-clone}{\code{CastorAPIWrapper$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-new}{}}}
+\subsection{Method \code{new()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$new(
+  username,
+  password,
+  key,
+  secret,
+  access_token = NULL,
+  type_to_func = self$type_to_func,
+  base_url = "https://dev.do.castoredc.com/",
+  verbose = self$verbose
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-castorOAuth"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-castorOAuth}{}}}
+\subsection{Method \code{castorOAuth()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$castorOAuth(key, secret, baseurl)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getRequest"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getRequest}{}}}
+\subsection{Method \code{getRequest()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getRequest(req_path, query_data = list(), raw = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-collectPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-collectPages}{}}}
+\subsection{Method \code{collectPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$collectPages(
+  request_url,
+  page = NULL,
+  include = NULL,
+  page_size = NULL,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getStudy"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getStudy}{}}}
+\subsection{Method \code{getStudy()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getStudy(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getStudiesPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getStudiesPages}{}}}
+\subsection{Method \code{getStudiesPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getStudiesPages(page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getUsersPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getUsersPages}{}}}
+\subsection{Method \code{getUsersPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getUsersPages(page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getForm"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getForm}{}}}
+\subsection{Method \code{getForm()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getForm(study_id, form_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getFormsPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getFormsPages}{}}}
+\subsection{Method \code{getFormsPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getFormsPages(study_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getVisit"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getVisit}{}}}
+\subsection{Method \code{getVisit()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getVisit(study_id, visit_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getVisitsPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getVisitsPages}{}}}
+\subsection{Method \code{getVisitsPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getVisitsPages(study_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getSurvey"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getSurvey}{}}}
+\subsection{Method \code{getSurvey()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getSurvey(study_id, survey_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getSurveysPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getSurveysPages}{}}}
+\subsection{Method \code{getSurveysPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getSurveysPages(study_id, include = "forms", page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getSurveyPackage"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getSurveyPackage}{}}}
+\subsection{Method \code{getSurveyPackage()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getSurveyPackage(study_id, surveypackage_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getSurveyPackagesPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getSurveyPackagesPages}{}}}
+\subsection{Method \code{getSurveyPackagesPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getSurveyPackagesPages(study_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getSurveyPackageInstance"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getSurveyPackageInstance}{}}}
+\subsection{Method \code{getSurveyPackageInstance()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getSurveyPackageInstance(study_id, surveypackageinstance_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getSurveyPackageInstancesPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getSurveyPackageInstancesPages}{}}}
+\subsection{Method \code{getSurveyPackageInstancesPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getSurveyPackageInstancesPages(study_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getRepeatingData"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getRepeatingData}{}}}
+\subsection{Method \code{getRepeatingData()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getRepeatingData(study_id, repeating_data_id, include = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getRepeatingDatasPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getRepeatingDatasPages}{}}}
+\subsection{Method \code{getRepeatingDatasPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getRepeatingDatasPages(
+  study_id,
+  include = "optiongroup",
+  page = NULL
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getRepeatingDataForm"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getRepeatingDataForm}{}}}
+\subsection{Method \code{getRepeatingDataForm()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getRepeatingDataForm(
+  study_id,
+  repeating_data_id,
+  repeating_data_form_id
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getRepeatingDataFormsPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getRepeatingDataFormsPages}{}}}
+\subsection{Method \code{getRepeatingDataFormsPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getRepeatingDataFormsPages(
+  study_id,
+  repeating_data_id,
+  page = NULL
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getField"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getField}{}}}
+\subsection{Method \code{getField()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getField(study_id, field_id, include = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getFieldsPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getFieldsPages}{}}}
+\subsection{Method \code{getFieldsPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getFieldsPages(study_id, include = "optiongroup", page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getParticipant"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getParticipant}{}}}
+\subsection{Method \code{getParticipant()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getParticipant(study_id, participant_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getParticipantsPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getParticipantsPages}{}}}
+\subsection{Method \code{getParticipantsPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getParticipantsPages(study_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getStudyDataPoint"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getStudyDataPoint}{}}}
+\subsection{Method \code{getStudyDataPoint()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getStudyDataPoint(study_id, participant_id, field_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getStudyDataPointsPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getStudyDataPointsPages}{}}}
+\subsection{Method \code{getStudyDataPointsPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getStudyDataPointsPages(study_id, participant_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-getRepeatingDataInstanceMetadataPages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-getRepeatingDataInstanceMetadataPages}{}}}
+\subsection{Method \code{getRepeatingDataInstanceMetadataPages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$getRepeatingDataInstanceMetadataPages(study_id, page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorAPIWrapper-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorAPIWrapper-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorAPIWrapper$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}

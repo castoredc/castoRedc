@@ -4,11 +4,11 @@ creds = list(
   example_study = "",
   base_url = "https://data.castoredc.com",
   example_field = "",
-  example_phase = "",
-  example_records = "",
-  example_report = "",
-  example_report_step = "",
-  example_step = "",
+  example_visit = "",
+  example_participants = "",
+  example_repeating_data = "",
+  example_repeating_data_form = "",
+  example_form = "",
   example_surveys = "",
   filter_vals = "dropdown"
 )
