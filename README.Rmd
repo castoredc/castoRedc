@@ -81,17 +81,17 @@ knitr::kable(head(subset(fields, select = -field_summary_template), 3))
 
 
 ```{r message=FALSE}
-steps <- castor_api$getSteps(example_study_id)
+forms <- castor_api$getForms(example_study_id)
 ```
 ```{r echo=FALSE, results='asis'}
-knitr::kable(steps)
+knitr::kable(forms)
 ```
 
 
 ```{r message=FALSE}
-phases <- castor_api$getPhases(example_study_id)
+visits <- castor_api$getVisits(example_study_id)
 ```
 ```{r echo=FALSE, results='asis'}
-knitr::kable(phases)
+knitr::kable(visits)
 ```
 
