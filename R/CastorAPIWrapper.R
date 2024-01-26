@@ -1,4 +1,5 @@
 #' @include CastorData.R
+#' @include utils.R
 NULL
 
 #' Class used to wrap Castor REST API.
@@ -53,9 +54,9 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
    access_token = NULL,
    type_to_func = list(
      date = function(date_val) as.Date(date_val, "%d-%m-%Y"),
-     year = as.integer,
-     numeric = as.numeric,
-     calculation = as.numeric,
+     year = function(value) as.integer(transform_missings(value)),
+     numeric = function(value) as.numeric(transform_missings(value)),
+     calculation = function(value) as.numeric(transform_missings(value)),
      radio = as.factor
    ),
    verbose = FALSE,
