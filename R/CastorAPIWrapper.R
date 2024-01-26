@@ -56,7 +56,7 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
      date = function(date_val) as.Date(date_val, "%d-%m-%Y"),
      year = function(value) as.integer(transform_missings(value)),
      numeric = function(value) as.numeric(transform_missings(value)),
-     calculation = function(value) as.numeric(transform_missings(value)),
+     calculation = as.character,
      radio = as.factor
    ),
    verbose = FALSE,
