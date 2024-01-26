@@ -27,10 +27,12 @@ remotes::install_github("castoredc/castoRedc")
 ## Missing data
 
 In the package, user missing data is handled in the following way. For
-non-numeric variables, they are represented by \##\_USER_MISSING_XX##
-where XX indicates the type of missing data. For numeric variables, they
-are represented by the values -99 to -95, where 95 to 99 represent the
-type of missing data in Castor.
+date variables, they are represented by 31-12-29XX, where XX (95-99)
+indicates the type of missing data. For numeric variables, they are
+represented by the values -99 to -95, where 95 to 99 represent the type
+of missing data in Castor. For non-numeric variables, they are
+represented by \##\_USER_MISSING_XX## where XX (95-99) indicates the
+type of missing data.
 
 ## Testing
 
