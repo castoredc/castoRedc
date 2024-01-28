@@ -651,10 +651,18 @@ CastorData <- R6::R6Class("CastorData",
                    field_variable_name %in% names(repeating_data_instances) &
                      field_type == "checkbox"))
 
-          attr(repeating_data_instances, "repeating_data_fields") <- repeating_data_fields
-
-          attr(adjusted_data_points.df, "repeating_data_instances") <- repeating_data_instances
+          # Split up in a list of dataframes per repeating_data_instance
+          repeating_data_instances <- split(repeating_data_instances, f = repeating_data_instances$repeating_data_name)
+          repeating_data_names <- names(repeating_data_instances)
+          # Only keep relevant fields
+          repeating_data_instances <- lapply(names(repeating_data_instances), function(name) {
+            repeating_data_instances[[name]] %>%
+              # Unselect all fields that belong to other repeating data instances
+              dplyr::select(-all_of(discard_at(repeating_data_fields, name) %>% unlist(use.names = F)))
+          })
+          names(repeating_data_instances) <- repeating_data_names
         }
+
       }
       if (survey_instances) {
         survey_instances <- self$getSurveyInstances(
