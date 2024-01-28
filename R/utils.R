@@ -1,6 +1,44 @@
 #' @include imports.R
 NULL
 
+
+#' transform_missings
+#'
+#' Transforms character missing values to the respective negative numeric values
+#'
+#' @param value The value in the Castor database
+#' @return The value, or the respective missing value if the value was missing
+#' @export
+transform_missings = function(value) {
+  case_when(
+    value == "##USER_MISSING_95##" ~ "-95",
+    value == "##USER_MISSING_96##" ~ "-96",
+    value == "##USER_MISSING_97##" ~ "-97",
+    value == "##USER_MISSING_98##" ~ "-98",
+    value == "##USER_MISSING_99##" ~ "-99",
+    .default = value
+  )
+}
+
+#' transform_missings_date
+#'
+#' Transforms character missing values to the respective negative numeric values for date variables
+#'
+#' @param value The value in the Castor database
+#' @return The value, or the respective missing value if the value was missing
+#' @export
+transform_missings_date = function(value) {
+  case_when(
+    value == "##USER_MISSING_95##" ~ "31-12-2995",
+    value == "##USER_MISSING_96##" ~ "31-12-2996",
+    value == "##USER_MISSING_97##" ~ "31-12-2997",
+    value == "##USER_MISSING_98##" ~ "31-12-2998",
+    value == "##USER_MISSING_99##" ~ "31-12-2999",
+    .default = value
+  )
+}
+
+
 #' @importFrom stats setNames
 split_checkbox <- function(values, field_info, sep_ = ";") {
   #cat("checkbox values:\n")

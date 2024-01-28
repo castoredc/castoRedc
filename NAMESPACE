@@ -3,6 +3,8 @@
 export(CastorAPIWrapper)
 export(CastorData)
 export(cols_to_map)
+export(transform_missings)
+export(transform_missings_date)
 import(dplyr)
 import(purrr)
 import(tidyr)
