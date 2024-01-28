@@ -566,6 +566,9 @@ CastorData <- R6::R6Class("CastorData",
       metadata_fields <- c("Participant_ID", "Site_Abbreviation",
                            "Randomization_Group",
                            "Participant_Creation")
+
+      data_list <- list()
+
       participant_metadata <- self$getParticipants(study_id)
       # Get field metadata for the given study to be used in adjustTypes.
       field_info <- self$getFieldInfo(study_id)
@@ -625,6 +628,7 @@ CastorData <- R6::R6Class("CastorData",
       if ("Participant_Creation" %in% names(adjusted_data_points.df))
         adjusted_data_points.df[["Participant_Creation"]] <-
         as.POSIXct(adjusted_data_points.df[["Participant_Creation"]], tz = "GMT")
+      data_list[["Study"]] <- adjusted_data_points.df
 
       if (repeating_data_instances || survey_instances)
         id_to_name <- cols_to_map(field_metadata, "field_id",
