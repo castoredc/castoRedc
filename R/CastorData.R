@@ -328,6 +328,18 @@ CastorData <- R6::R6Class("CastorData",
         return(NULL)
       }
 
+      # Get survey field ids and names to later clean up the split dataframes
+      survey_field_id <- survey_instances %>%
+        dplyr::select(field_id, survey_name) %>%
+        distinct() %>%
+        rowwise() %>%
+        mutate(field_name = id_to_field_name_[[field_id]]) %>%
+        dplyr::select(-field_id) %>%
+        ungroup()
+
+      survey_field_id <- split(survey_field_id$field_name, survey_field_id$survey_name)
+
+
       survey_inst_fields <- c("field_id", "survey_instance_id", "field_value",
                               "participant_id", "survey_name")
 
@@ -340,12 +352,14 @@ CastorData <- R6::R6Class("CastorData",
         Participant_ID = participant_id,
         package_name = survey_name)
 
-      if (!is.null(id_to_field_name_))
-        rename_at(survey_data, vars(-Participant_ID, -package_name,
+      if (!is.null(id_to_field_name_)) {
+        survey_data <- rename_at(survey_data, vars(-Participant_ID, -package_name,
                                     -survey_instance_id),
-                  ~unlist(id_to_field_name_, recursive = FALSE)[.])
-      else
-        survey_data
+                  ~unlist(id_to_field_name_, recursive = FALSE)[.])}
+
+      attr(survey_data, "survey_field_names") <- survey_field_id
+
+      return(survey_data)
     },
     getSurveyInstanceBulk = function(study_id, participant_id, survey_instance_id) {
       si_url <- glue("study/{study_id}/participant/{participant_id}",
@@ -660,27 +674,44 @@ CastorData <- R6::R6Class("CastorData",
               # Unselect all fields that belong to other repeating data instances
               dplyr::select(-all_of(discard_at(repeating_data_fields, name) %>% unlist(use.names = F)))
           })
+
           names(repeating_data_instances) <- repeating_data_names
+          data_list[["Repeating data"]] <- repeating_data_instances
         }
 
       }
       if (survey_instances) {
         survey_instances <- self$getSurveyInstances(
           study_id = study_id, id_to_field_name = id_to_name)
+
+        survey_fields <- attr(survey_instances, "survey_fields")
+
         if (!is.null(survey_instances)) {
           survey_instances <- self$adjustCheckboxFields(
             survey_instances,
             filter(field_metadata,
                    field_variable_name %in% names(survey_instances)))
 
-          attr(adjusted_data_points.df, "survey_instances") <- survey_instances
+          # Split up in a list of dataframes per survey
+          # NB: package_name is a misnomer, should be survey_name
+          survey_instances <- split(survey_instances, f = survey_instances$package_name)
+          survey_names <- names(survey_instances)
+          # Only keep relevant fields
+          survey_instances <- lapply(names(survey_instances), function(name) {
+            survey_instances[[name]] %>%
+              # Unselect all fields that belong to other repeating data instances
+              dplyr::select(-all_of(discard_at(survey_fields, name) %>% unlist(use.names = F)))
+          })
+          names(survey_instances) <- survey_names
+
+          data_list[["Surveys"]] <- survey_instances
         }
       }
 
-      attr(adjusted_data_points.df, "field_metadata") <- field_metadata
-      attr(adjusted_data_points.df, "castor") <- TRUE
+      attr(data_list, "field_metadata") <- field_metadata
+      attr(data_list, "castor") <- TRUE
 
-      adjusted_data_points.df
+      data_list
     },
     generateCheckboxFields = function(field_info, checkboxes = NULL) {
       if (is.null(checkboxes))
