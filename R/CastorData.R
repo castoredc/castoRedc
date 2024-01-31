@@ -236,10 +236,10 @@ CastorData <- R6::R6Class("CastorData",
                                              "repeating_data_instance_name",
                                              "repeating_data_name")
 
-      repeating_data_instances <- left_join(
+      repeating_data_instances2 <- left_join(
         repeating_data_instances,
-        select(ri_metadata, repeating_data_instance_name, repeating_data_name, created_on),
-        by = "repeating_data_instance_name"
+        select(ri_metadata, repeating_data_instance_id, repeating_data_name, created_on),
+        by = "repeating_data_instance_id"
       )
 
       repeating_data_fields <- cols_to_map(repeating_data_instances, "repeating_data_name",
