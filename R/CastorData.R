@@ -18,9 +18,14 @@ NULL
 #'  for a given study and participant. Filter types may be supplied for fields types
 #'  as a character vector of field types.
 #'  }
-#'  \item \code{getStudyData(study_id, filter_types): creates a data
-#'  frame with all data points for a given study with each row representing a
-#'  participant and each column a field.
+#'  \item \code{getStudyData(study_id,
+#'                           load_study_data,
+#'                           repeating_data_instances,
+#'                           survey_instances,
+#'                           filter_types):
+#'  creates a named nested list with a dataframe for all study data, a
+#'  list of dataframes for repeating data instances and a list of dataframes
+#'  for survey instances.
 #'  }
 #'  \item \code{getOptionGroups(study_id): creates a data
 #'  frame with all option groups for a given study with each row representing an
@@ -572,8 +577,8 @@ CastorData <- R6::R6Class("CastorData",
     },
     getStudyData = function(study_id, bulk = TRUE,
                             load_study_data = TRUE,
-                            repeating_data_instances = FALSE,
-                            survey_instances = FALSE,
+                            repeating_data_instances = TRUE,
+                            survey_instances = TRUE,
                             filter_types = c("remark", "image", "summary",
                                              "upload", "repeated_measures",
                                              "add_repeating_data_button")) {
