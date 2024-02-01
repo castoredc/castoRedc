@@ -97,7 +97,7 @@ CastorData <- R6::R6Class("CastorData",
       surveypackageinstances_pages <-
         self$getSurveyPackageInstancesPages(study_id)
 
-      private$mergePages(surveypackageinstances_pages, "surveypackageinstances")
+      private$mergePages(surveypackageinstances_pages, "surveypackageinstance")
     },
     getRepeatingDatas = function(study_id) {
       if (self$verbose) message("Getting all repeating_datas for study ", study_id)
