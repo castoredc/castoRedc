@@ -252,9 +252,8 @@ CastorData <- R6::R6Class("CastorData",
 
       repeating_data_data <- rename(
         spread(
-          distinct(
             select(repeating_data_instances, participant_id, field_id, repeating_data_name,
-                   created_on, repeating_data_instance_name, field_value)),
+                   created_on, repeating_data_instance_name, field_value),
           field_id, field_value),
         Participant_ID = participant_id,
         repeating_data_inst_name = repeating_data_instance_name)
