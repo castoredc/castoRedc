@@ -18,9 +18,14 @@ NULL
 #'  for a given study and participant. Filter types may be supplied for fields types
 #'  as a character vector of field types.
 #'  }
-#'  \item \code{getStudyData(study_id, filter_types): creates a data
-#'  frame with all data points for a given study with each row representing a
-#'  participant and each column a field.
+#'  \item \code{getStudyData(study_id,
+#'                           load_study_data,
+#'                           repeating_data_instances,
+#'                           survey_instances,
+#'                           filter_types):
+#'  creates a named nested list with a dataframe for all study data, a
+#'  list of dataframes for repeating data instances and a list of dataframes
+#'  for survey instances.
 #'  }
 #'  \item \code{getOptionGroups(study_id): creates a data
 #'  frame with all option groups for a given study with each row representing an
@@ -328,6 +333,18 @@ CastorData <- R6::R6Class("CastorData",
         return(NULL)
       }
 
+      # Get survey field ids and names to later clean up the split dataframes
+      survey_field_id <- survey_instances %>%
+        dplyr::select(field_id, survey_name) %>%
+        distinct() %>%
+        rowwise() %>%
+        mutate(field_name = id_to_field_name_[[field_id]]) %>%
+        dplyr::select(-field_id) %>%
+        ungroup()
+
+      survey_field_id <- split(survey_field_id$field_name, survey_field_id$survey_name)
+
+
       survey_inst_fields <- c("field_id", "survey_instance_id", "field_value",
                               "participant_id", "survey_name")
 
@@ -340,12 +357,14 @@ CastorData <- R6::R6Class("CastorData",
         Participant_ID = participant_id,
         package_name = survey_name)
 
-      if (!is.null(id_to_field_name_))
-        rename_at(survey_data, vars(-Participant_ID, -package_name,
+      if (!is.null(id_to_field_name_)) {
+        survey_data <- rename_at(survey_data, vars(-Participant_ID, -package_name,
                                     -survey_instance_id),
-                  ~unlist(id_to_field_name_, recursive = FALSE)[.])
-      else
-        survey_data
+                  ~unlist(id_to_field_name_, recursive = FALSE)[.])}
+
+      attr(survey_data, "survey_field_names") <- survey_field_id
+
+      return(survey_data)
     },
     getSurveyInstanceBulk = function(study_id, participant_id, survey_instance_id) {
       si_url <- glue("study/{study_id}/participant/{participant_id}",
@@ -450,6 +469,8 @@ CastorData <- R6::R6Class("CastorData",
               participant_metadata,
               participant_id,
               Randomization_Group = randomization_group,
+              Randomization_Group_Name = randomization_group_name,
+              Randomized_On = randomized_on.date,
               Site_Abbreviation = `_embedded.site.abbreviation`,
               Participant_Creation = created_on.date),
             study_data_compelete_cases,
@@ -558,14 +579,17 @@ CastorData <- R6::R6Class("CastorData",
     },
     getStudyData = function(study_id, bulk = TRUE,
                             load_study_data = TRUE,
-                            repeating_data_instances = FALSE,
-                            survey_instances = FALSE,
+                            repeating_data_instances = TRUE,
+                            survey_instances = TRUE,
                             filter_types = c("remark", "image", "summary",
                                              "upload", "repeated_measures",
                                              "add_repeating_data_button")) {
       metadata_fields <- c("Participant_ID", "Site_Abbreviation",
                            "Randomization_Group",
                            "Participant_Creation")
+
+      data_list <- list()
+
       participant_metadata <- self$getParticipants(study_id)
       # Get field metadata for the given study to be used in adjustTypes.
       field_info <- self$getFieldInfo(study_id)
@@ -593,6 +617,8 @@ CastorData <- R6::R6Class("CastorData",
             participant_metadata,
             participant_id,
             Randomization_Group = randomization_group,
+            Randomization_Group_Name = randomization_group_name,
+            Randomized_On = randomized_on.date,
             Site_Abbreviation = `_embedded.site.abbreviation`,
             Participant_Creation = created_on.date
           ),
@@ -625,6 +651,7 @@ CastorData <- R6::R6Class("CastorData",
       if ("Participant_Creation" %in% names(adjusted_data_points.df))
         adjusted_data_points.df[["Participant_Creation"]] <-
         as.POSIXct(adjusted_data_points.df[["Participant_Creation"]], tz = "GMT")
+      data_list[["Study"]] <- adjusted_data_points.df
 
       if (repeating_data_instances || survey_instances)
         id_to_name <- cols_to_map(field_metadata, "field_id",
@@ -647,28 +674,53 @@ CastorData <- R6::R6Class("CastorData",
                    field_variable_name %in% names(repeating_data_instances) &
                      field_type == "checkbox"))
 
-          attr(repeating_data_instances, "repeating_data_fields") <- repeating_data_fields
+          # Split up in a list of dataframes per repeating_data_instance
+          repeating_data_instances <- split(repeating_data_instances, f = repeating_data_instances$repeating_data_name)
+          repeating_data_names <- names(repeating_data_instances)
+          # Only keep relevant fields
+          repeating_data_instances <- lapply(names(repeating_data_instances), function(name) {
+            repeating_data_instances[[name]] %>%
+              # Unselect all fields that belong to other repeating data instances
+              dplyr::select(-all_of(discard_at(repeating_data_fields, name) %>% unlist(use.names = F)))
+          })
 
-          attr(adjusted_data_points.df, "repeating_data_instances") <- repeating_data_instances
+          names(repeating_data_instances) <- repeating_data_names
+          data_list[["Repeating data"]] <- repeating_data_instances
         }
+
       }
       if (survey_instances) {
         survey_instances <- self$getSurveyInstances(
           study_id = study_id, id_to_field_name = id_to_name)
+
+        survey_fields <- attr(survey_instances, "survey_fields")
+
         if (!is.null(survey_instances)) {
           survey_instances <- self$adjustCheckboxFields(
             survey_instances,
             filter(field_metadata,
                    field_variable_name %in% names(survey_instances)))
 
-          attr(adjusted_data_points.df, "survey_instances") <- survey_instances
+          # Split up in a list of dataframes per survey
+          # NB: package_name is a misnomer, should be survey_name
+          survey_instances <- split(survey_instances, f = survey_instances$package_name)
+          survey_names <- names(survey_instances)
+          # Only keep relevant fields
+          survey_instances <- lapply(names(survey_instances), function(name) {
+            survey_instances[[name]] %>%
+              # Unselect all fields that belong to other repeating data instances
+              dplyr::select(-all_of(discard_at(survey_fields, name) %>% unlist(use.names = F)))
+          })
+          names(survey_instances) <- survey_names
+
+          data_list[["Surveys"]] <- survey_instances
         }
       }
 
-      attr(adjusted_data_points.df, "field_metadata") <- field_metadata
-      attr(adjusted_data_points.df, "castor") <- TRUE
+      attr(data_list, "field_metadata") <- field_metadata
+      attr(data_list, "castor") <- TRUE
 
-      adjusted_data_points.df
+      data_list
     },
     generateCheckboxFields = function(field_info, checkboxes = NULL) {
       if (is.null(checkboxes))
