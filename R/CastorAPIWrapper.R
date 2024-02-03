@@ -346,7 +346,7 @@ CastorAPIWrapper <- R6::R6Class("CastorAPIWrapper",
      ri_md_url <- glue("study/{study_id}/repeating-data-instance")
      self$collectPages(ri_md_url, page = page)
    }),
-  private = list(password = NULL,
-               secret = NULL
-  )
-)
+private = list(
+  password = NULL,
+  secret = NULL
+))
