@@ -795,15 +795,6 @@ CastorData <- R6::R6Class("CastorData",
 
       mutate_at(study_data, other_fields, as.character)
     },
-    #' transformOptionGroups
-    #'
-    #' Transforms option group values to missing labels in a dataframe
-    #' First calls the information from the Castor API, then transform the values.
-    #'
-    #' @param dataframe The dataframe or list of dataframes for which values have to be transformed. Only work if columns names are equal to the Castor field names.
-    #' @param study_id The study id that the data belongs to
-    #' @return The value, or the respective missing value if the value was missing
-    #' @export
     transformOptionGroups = function(dataframe, study_id) {
       field_info <- self$getFieldInfo(study_id)
       option_group <- self$getOptionGroups(study_id)
@@ -843,16 +834,6 @@ CastorData <- R6::R6Class("CastorData",
 
       return(pages_merged)
     },
-    #' transformOptionGroupsInternal
-    #'
-    #' Transforms option group values to missing labels in a dataframe given the appropriate information.
-    #' If the appropriate information is not called from the API yet, use transform_option_groups, which first retrieves the correct information
-    #'
-    #' @param dataframes A list of dataframe(s) for which values have to be transformed. Only work if columns names are equal to the Castor field names.
-    #' @param field_info A dataframe containing the link between the fields and the option groups
-    #' @param option_groups A dataframe containing the link between the option groups and value/label combinations
-    #' @return The value, or the respective missing value if the value was missing
-    #' @export
     transformOptionGroupsInternal = function(dataframes, field_info, option_group) {
       original_list <- T
       if (class(dataframes) != "list") {
