@@ -246,22 +246,40 @@ CastorData <- R6::R6Class("CastorData",
                                              "repeating_data_instance_name",
                                              "repeating_data_name")
 
+      # Left join fields on repeating data instances
+      # Empty instances thus get field value and field label NA
       repeating_data_instances <- left_join(
-        repeating_data_instances,
-        select(ri_metadata, repeating_data_instance_id, repeating_data_name, created_on),
+        select(
+          ri_metadata,
+          repeating_data_instance_id,
+          repeating_data_instance_name,
+          participant_id,
+          repeating_data_name,
+          created_on
+        ),
+        select(
+          repeating_data_instances,
+          repeating_data_instance_id,
+          field_id,
+          field_value
+        ),
         by = "repeating_data_instance_id"
       )
 
       repeating_data_fields <- cols_to_map(repeating_data_instances, "repeating_data_name",
                                    "field_id")
 
+      # Pivot wider on repeating data instance, put all fields with values in columns per instance
+      # Remove field labelled NA (artefact of repeating data instances without fields)
       repeating_data_data <- rename(
-        spread(
+        pivot_wider(
             select(repeating_data_instances, participant_id, field_id, repeating_data_name,
                    created_on, repeating_data_instance_name, field_value),
-          field_id, field_value),
+            id_cols = c(repeating_data_name, created_on, participant_id, repeating_data_instance_name),
+          names_from = field_id, values_from = field_value),
         Participant_ID = participant_id,
-        repeating_data_inst_name = repeating_data_instance_name)
+        repeating_data_inst_name = repeating_data_instance_name) %>%
+        dplyr::select(!`NA`)
 
       if (is.null(id_to_field_name_)) {
         fields <- self$getFields(study_id_)
