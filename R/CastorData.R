@@ -266,8 +266,12 @@ CastorData <- R6::R6Class("CastorData",
         by = "repeating_data_instance_id"
       )
 
-      repeating_data_fields <- cols_to_map(repeating_data_instances, "repeating_data_name",
-                                   "field_id")
+      # Find the fields that are filled in at least once for each repeating data
+      # Link them to this repeating data, and remove NA (artefact of empty instances)
+      repeating_data_fields <-
+      lapply(cols_to_map(repeating_data_instances, "repeating_data_name",
+                         "field_id"), function(repeating_data)
+                           repeating_data[!is.na(repeating_data)])
 
       # Pivot wider on repeating data instance, put all fields with values in columns per instance
       # Remove field labelled NA (artefact of repeating data instances without fields)
@@ -280,6 +284,8 @@ CastorData <- R6::R6Class("CastorData",
         Participant_ID = participant_id,
         repeating_data_inst_name = repeating_data_instance_name) %>%
         dplyr::select(!`NA`)
+
+
 
       if (is.null(id_to_field_name_)) {
         fields <- self$getFields(study_id_)
