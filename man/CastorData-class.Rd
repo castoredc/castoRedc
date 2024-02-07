@@ -32,10 +32,12 @@ Class used to access Castor REST API.
                           load_study_data,
                           repeating_data_instances,
                           survey_instances,
+                          translate_option_values,
                           filter_types):
  creates a named nested list with a dataframe for all study data, a
  list of dataframes for repeating data instances and a list of dataframes
- for survey instances.
+ for survey instances. Can toggle which data is extracted, and whether
+ option group values are translated to labels.
  }
  \item \code{getOptionGroups(study_id): creates a data
  frame with all option groups for a given study with each row representing an
@@ -50,6 +52,9 @@ Class used to access Castor REST API.
  for casting columns to their intended type. Users can supply their own list
  of data type : function (for casting the data) mappings on instantiation of
  this class, CastorAPIWrapper.
+ }
+ \item \code{transformOptionGroups = function(dataframe, study_id): Utility method
+ for transforming a dataframe with option group values to the correct labels.
  }
 }
 }
@@ -91,6 +96,7 @@ Class used to access Castor REST API.
 \item \href{#method-CastorData-generateCheckboxFields}{\code{CastorData$generateCheckboxFields()}}
 \item \href{#method-CastorData-adjustCheckboxFields}{\code{CastorData$adjustCheckboxFields()}}
 \item \href{#method-CastorData-adjustTypes}{\code{CastorData$adjustTypes()}}
+\item \href{#method-CastorData-transformOptionGroups}{\code{CastorData$transformOptionGroups()}}
 \item \href{#method-CastorData-clone}{\code{CastorData$clone()}}
 }
 }
@@ -399,6 +405,7 @@ Class used to access Castor REST API.
   load_study_data = TRUE,
   repeating_data_instances = TRUE,
   survey_instances = TRUE,
+  translate_option_values = TRUE,
   filter_types = c("remark", "image", "summary", "upload", "repeated_measures",
     "add_repeating_data_button")
 )}\if{html}{\out{</div>}}
@@ -429,6 +436,15 @@ Class used to access Castor REST API.
 \subsection{Method \code{adjustTypes()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CastorData$adjustTypes(study_data, field_metadata, type_to_func, filter_types)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-transformOptionGroups"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-transformOptionGroups}{}}}
+\subsection{Method \code{transformOptionGroups()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$transformOptionGroups(dataframe, study_id)}\if{html}{\out{</div>}}
 }
 
 }

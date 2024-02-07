@@ -22,10 +22,12 @@ NULL
 #'                           load_study_data,
 #'                           repeating_data_instances,
 #'                           survey_instances,
+#'                           translate_option_values,
 #'                           filter_types):
 #'  creates a named nested list with a dataframe for all study data, a
 #'  list of dataframes for repeating data instances and a list of dataframes
-#'  for survey instances.
+#'  for survey instances. Can toggle which data is extracted, and whether
+#'  option group values are translated to labels.
 #'  }
 #'  \item \code{getOptionGroups(study_id): creates a data
 #'  frame with all option groups for a given study with each row representing an
@@ -40,6 +42,9 @@ NULL
 #'  for casting columns to their intended type. Users can supply their own list
 #'  of data type : function (for casting the data) mappings on instantiation of
 #'  this class, CastorAPIWrapper.
+#'  }
+#'  \item \code{transformOptionGroups = function(dataframe, study_id): Utility method
+#'  for transforming a dataframe with option group values to the correct labels.
 #'  }
 #' }
 #' @docType class
@@ -580,6 +585,7 @@ CastorData <- R6::R6Class("CastorData",
                             load_study_data = TRUE,
                             repeating_data_instances = TRUE,
                             survey_instances = TRUE,
+                            translate_option_values = TRUE,
                             filter_types = c("remark", "image", "summary",
                                              "upload", "repeated_measures",
                                              "add_repeating_data_button")) {
@@ -719,7 +725,13 @@ CastorData <- R6::R6Class("CastorData",
       attr(data_list, "field_metadata") <- field_metadata
       attr(data_list, "castor") <- TRUE
 
-      data_list
+      if (translate_option_values) {
+        option_group <- self$getOptionGroups(study_id)
+        lapply(data_list, function(x)
+          private$transformOptionGroupsInternal(x, field_metadata, option_group))
+      } else {
+        data_list
+      }
     },
     generateCheckboxFields = function(field_info, checkboxes = NULL) {
       if (is.null(checkboxes))
@@ -781,6 +793,11 @@ CastorData <- R6::R6Class("CastorData",
                            field_variable_name)
 
       mutate_at(study_data, other_fields, as.character)
+    },
+    transformOptionGroups = function(dataframe, study_id) {
+      field_info <- self$getFieldInfo(study_id)
+      option_group <- self$getOptionGroups(study_id)
+      self$transformOptionGroupsInternal(dataframe, field_info, option_group)
     }
   ),
   private = list(
@@ -815,6 +832,37 @@ CastorData <- R6::R6Class("CastorData",
           pages_merged <- NULL
 
       return(pages_merged)
+    },
+    transformOptionGroupsInternal = function(dataframes, field_info, option_group) {
+      original_list <- T
+      if (class(dataframes) != "list") {
+        dataframes <- list(dataframes)
+        original_list <- F
+      }
+      # Find fields with option groups
+      transform_fields <- select(filter(field_info, !is.na(option_group.name)),
+                                field_variable_name, option_group.name)
+      # Find option groups with their respective value/labels
+      option_group_link <- select(option_group, name, options)
+      # Link fields to option group options in a list of dataframes
+      field_option_link <- unnest(left_join(transform_fields, option_group_link, by=c("option_group.name"="name")), options)
+      link_dataframes <- split(field_option_link, field_option_link$field_variable_name)
+      link_lists <-
+        lapply(link_dataframes, function(x) {
+          split(x$name, as.character(x$value))
+        })
+      # Apply over list of dataframes and transform values into labels
+      return_data <- lapply(dataframes, function(dataframe) {
+        mutate(dataframe, across(any_of(names(link_lists)), function(column) {
+          map_value_label(column, link_lists[[cur_column()]])
+        }
+        ))
+      })
+      if (original_list) {
+        return_data
+      } else (
+        return_data[[1]]
+      )
     }
   )
-)
+  )

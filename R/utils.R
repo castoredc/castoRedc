@@ -38,6 +38,27 @@ transform_missings_date = function(value) {
   )
 }
 
+#' map_value_label
+#'
+#' Maps a vector of values to labels given the value label link
+#'
+#' @param value_vector The vector with values
+#' @param link_list A list with values as names and labels as items
+#' @return A vector with labels
+#' @export
+map_value_label = function(value_vector, link_list) {
+  as.factor(sapply(value_vector, function(x) {
+    # Get matching value
+    result <- link_list[[as.character(x)]]
+    # If no matching value (NA) then return NA
+    if (is.null(result)) {
+      NA
+    } else {
+      result
+    }
+  }))
+}
+
 
 #' @importFrom stats setNames
 split_checkbox <- function(values, field_info, sep_ = ";") {
