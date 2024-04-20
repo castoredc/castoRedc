@@ -14,7 +14,8 @@ creds = list(
 )
 
 castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
-study_hash <- digest::digest(castor_api$getStudyData(creds$example_study))
+entire_study <- castor_api$getStudyData(creds$example_study)
+study_hash <- digest::digest(entire_study)
 
 creds$study_hash <- study_hash
 

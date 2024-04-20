@@ -346,27 +346,32 @@ CastorData <- R6::R6Class("CastorData",
       # Unnest the surveys in the survey packages, so each row represents a survey instance
       si_metadata <- unnest(spi_metadata, `_embedded.survey_instances`, names_sep = "_")
 
-      # TODO
-      selected_cols <- c("id", "_embedded.survey_instances__embedded.survey.name", "status", "parent_id", "parent_type",
-                         "participant_id", "repeating_data_name", "created_on",
-                         "created_by", "_embedded.repeating_data.repeating_data_id",
-                         "_embedded.repeating_data.description",
-                         "_embedded.repeating_data.type")
+      # Select only relevant columns
+      selected_cols <- c("_embedded.survey_instances__embedded.survey.id",
+                         "participant_id",
+                         "_embedded.survey_instances__embedded.survey.name",
+                         "survey_package_name",
+                         "survey_package_instance_id",
+                         "created_on.date",
+                         "created_by",
+                         "sent_on.date",
+                         "finished_on.date",
+                         "parent_id",
+                         "parent_type")
 
       name_map <- c(
-        "id" = "repeating_data_instance_id",
-        "name" = "repeating_data_instance_name",
-        "status" = "repeating_data_instance_status",
-        "parent_id" = "repeating_data_instance_parent_id",
-        "parent_type" = "repeating_data_instance_parent_type",
-        "_embedded.repeating_data.repeating_data_id" = "repeating_data_id",
-        "_embedded.repeating_data.description" = "repeating_data_description",
-        "_embedded.repeating_data.type" = "repeating_data_type"
+        "_embedded.survey_instances__embedded.survey.id" = "survey_instance_id",
+        "_embedded.survey_instances__embedded.survey.name" = "survey_instance_name",
+        "parent_id" = "survey_package_instance_parent_id",
+        "parent_type" = "survey_package_instance_parent_type",
+        "created_on.date" = "created_on",
+        "sent_on.date" = "sent_on",
+        "finished_on.date" = "finished_on"
       )
 
-      ri_metadata <- ri_metadata[selected_cols]
+      si_metadata <- si_metadata[selected_cols]
 
-      rename_at(ri_metadata, names(name_map), ~name_map[.])
+      rename_at(si_metadata, names(name_map), ~name_map[.])
     },
     getSurveyInstances = function(study_id, participant_id = NULL,
                                   id_to_field_name = NULL) {
@@ -412,15 +417,18 @@ CastorData <- R6::R6Class("CastorData",
         spread(
           distinct(
             select(survey_instances, survey_instance_id, participant_id, field_id,
-                   survey_name, field_value)),
+                   field_value)),
           field_id, field_value),
-        Participant_ID = participant_id,
-        package_name = survey_name)
+        Participant_ID = participant_id)
 
       if (!is.null(id_to_field_name_)) {
-        survey_data <- rename_at(survey_data, vars(-Participant_ID, -package_name,
+        survey_data <- rename_at(survey_data, vars(-Participant_ID,
                                     -survey_instance_id),
                   ~unlist(id_to_field_name_, recursive = FALSE)[.])}
+
+
+      # Add metadata to survey fields
+      survey_data <- left_join(si_metadata, survey_data, by="survey_instance_id")
 
       attr(survey_data, "survey_field_names") <- survey_field_id
 
@@ -761,7 +769,7 @@ CastorData <- R6::R6Class("CastorData",
         survey_instances <- self$getSurveyInstances(
           study_id = study_id, id_to_field_name = id_to_name)
 
-        survey_fields <- attr(survey_instances, "survey_fields")
+        survey_fields <- attr(survey_instances, "survey_field_names")
 
         if (!is.null(survey_instances)) {
           survey_instances <- self$adjustCheckboxFields(
@@ -771,7 +779,7 @@ CastorData <- R6::R6Class("CastorData",
 
           # Split up in a list of dataframes per survey
           # NB: package_name is a misnomer, should be survey_name
-          survey_instances <- split(survey_instances, f = survey_instances$package_name)
+          survey_instances <- split(survey_instances, f = survey_instances$survey_instance_name)
           survey_names <- names(survey_instances)
           # Only keep relevant fields
           survey_instances <- lapply(names(survey_instances), function(name) {
