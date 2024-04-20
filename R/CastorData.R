@@ -338,6 +338,36 @@ CastorData <- R6::R6Class("CastorData",
 
       rename_at(ri_metadata, names(name_map), ~name_map[.])
     },
+    getSurveyInstanceMetadata = function(study_id) {
+      # Get all survey package pages
+      spi_md_pages <- self$getSurveyPackageInstanceMetadataPages(study_id = study_id)
+      # Merge pages together in a large dataframe
+      spi_metadata <- private$mergePages(spi_md_pages, "surveypackageinstance")
+      # Unnest the surveys in the survey packages, so each row represents a survey instance
+      si_metadata <- unnest(spi_metadata, `_embedded.survey_instances`, names_sep = "_")
+
+      # TODO
+      selected_cols <- c("id", "_embedded.survey_instances__embedded.survey.name", "status", "parent_id", "parent_type",
+                         "participant_id", "repeating_data_name", "created_on",
+                         "created_by", "_embedded.repeating_data.repeating_data_id",
+                         "_embedded.repeating_data.description",
+                         "_embedded.repeating_data.type")
+
+      name_map <- c(
+        "id" = "repeating_data_instance_id",
+        "name" = "repeating_data_instance_name",
+        "status" = "repeating_data_instance_status",
+        "parent_id" = "repeating_data_instance_parent_id",
+        "parent_type" = "repeating_data_instance_parent_type",
+        "_embedded.repeating_data.repeating_data_id" = "repeating_data_id",
+        "_embedded.repeating_data.description" = "repeating_data_description",
+        "_embedded.repeating_data.type" = "repeating_data_type"
+      )
+
+      ri_metadata <- ri_metadata[selected_cols]
+
+      rename_at(ri_metadata, names(name_map), ~name_map[.])
+    },
     getSurveyInstances = function(study_id, participant_id = NULL,
                                   id_to_field_name = NULL) {
       self$getSurveyInstancesBulk(study_id, participant_id_ = participant_id,
@@ -361,6 +391,9 @@ CastorData <- R6::R6Class("CastorData",
         return(NULL)
       }
 
+      # Get all survey instances
+      si_metadata <- self$getSurveyInstanceMetadata(study_id_)
+
       # Get survey field ids and names to later clean up the split dataframes
       survey_field_id <- survey_instances %>%
         dplyr::select(field_id, survey_name) %>%
@@ -371,7 +404,6 @@ CastorData <- R6::R6Class("CastorData",
         ungroup()
 
       survey_field_id <- split(survey_field_id$field_name, survey_field_id$survey_name)
-
 
       survey_inst_fields <- c("field_id", "survey_instance_id", "field_value",
                               "participant_id", "survey_name")
