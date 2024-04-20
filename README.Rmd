@@ -12,6 +12,8 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
+library(tidyverse)
+
 credentials <- readRDS("tests/testthat/testing_credentials.Rds")
 ```
 # Castor API R Package
@@ -70,6 +72,30 @@ knitr::kable(studies)
 
 ```{r message=FALSE}
 (example_study_id <- studies[["study_id"]][1])
+```
+
+```{r message=FALSE}
+study <- castor_api$getStudyData(example_study_id)
+```
+
+```{r echo=FALSE, results='asis'}
+study[["Study"]] <- study[["Study"]][1:5,1:10]
+study[["Repeating data"]] <-
+  lapply(study[["Repeating data"]], function(x)
+    x %>%
+      rowwise() %>%
+      mutate(missing = sum(is.na(
+        c_across(everything())
+      ))) %>% ungroup() %>% slice_min(missing, n = 5, with_ties = F) %>% select(!missing))
+study[["Surveys"]] <-
+  lapply(study[["Surveys"]], function(x)
+    x %>%
+      rowwise() %>%
+      mutate(missing = sum(is.na(
+        c_across(everything())
+      ))) %>% ungroup() %>% slice_min(missing, n = 5, with_ties = F) %>% select(!missing))
+
+knitr::kable(study)
 ```
 
 

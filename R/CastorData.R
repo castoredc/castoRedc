@@ -488,8 +488,15 @@ CastorData <- R6::R6Class("CastorData",
                                   field_variable_name, participant_id, field_value)
         study_data_wide <- spread(study_data_long,
                                   field_variable_name, field_value)
-        study_data_compelete_cases <- filter_all(study_data_wide,
+        study_data_complete_cases <- filter_all(study_data_wide,
                                                  any_vars(!is.na(.)))
+
+        # Add randomized on date for studies without randomization
+        # Is not retrieved from API, but needs to exist for further steps
+        if (!("randomized_on.date" %in% names(participant_metadata))) {
+          participant_metadata <- participant_metadata %>%
+            mutate(randomized_on.date = NA_character_)
+        }
 
         rename(
           left_join(
@@ -501,7 +508,7 @@ CastorData <- R6::R6Class("CastorData",
               Randomized_On = randomized_on.date,
               Site_Abbreviation = `_embedded.site.abbreviation`,
               Participant_Creation = created_on.date),
-            study_data_compelete_cases,
+            study_data_complete_cases,
             by="participant_id"
           ),
           Participant_ID = participant_id
