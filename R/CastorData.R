@@ -246,22 +246,46 @@ CastorData <- R6::R6Class("CastorData",
                                              "repeating_data_instance_name",
                                              "repeating_data_name")
 
+      # Left join fields on repeating data instances
+      # Empty instances thus get field value and field label NA
       repeating_data_instances <- left_join(
-        repeating_data_instances,
-        select(ri_metadata, repeating_data_instance_id, repeating_data_name, created_on),
+        select(
+          ri_metadata,
+          repeating_data_instance_id,
+          repeating_data_instance_name,
+          participant_id,
+          repeating_data_name,
+          created_on
+        ),
+        select(
+          repeating_data_instances,
+          repeating_data_instance_id,
+          field_id,
+          field_value
+        ),
         by = "repeating_data_instance_id"
       )
 
-      repeating_data_fields <- cols_to_map(repeating_data_instances, "repeating_data_name",
-                                   "field_id")
+      # Find the fields that are filled in at least once for each repeating data
+      # Link them to this repeating data, and remove NA (artefact of empty instances)
+      repeating_data_fields <-
+      lapply(cols_to_map(repeating_data_instances, "repeating_data_name",
+                         "field_id"), function(repeating_data)
+                           repeating_data[!is.na(repeating_data)])
 
+      # Pivot wider on repeating data instance, put all fields with values in columns per instance
+      # Remove field labelled NA (artefact of repeating data instances without fields)
       repeating_data_data <- rename(
-        spread(
+        pivot_wider(
             select(repeating_data_instances, participant_id, field_id, repeating_data_name,
                    created_on, repeating_data_instance_name, field_value),
-          field_id, field_value),
+            id_cols = c(repeating_data_name, created_on, participant_id, repeating_data_instance_name),
+          names_from = field_id, values_from = field_value),
         Participant_ID = participant_id,
-        repeating_data_inst_name = repeating_data_instance_name)
+        repeating_data_inst_name = repeating_data_instance_name) %>%
+        dplyr::select(!`NA`)
+
+
 
       if (is.null(id_to_field_name_)) {
         fields <- self$getFields(study_id_)
@@ -314,6 +338,41 @@ CastorData <- R6::R6Class("CastorData",
 
       rename_at(ri_metadata, names(name_map), ~name_map[.])
     },
+    getSurveyInstanceMetadata = function(study_id) {
+      # Get all survey package pages
+      spi_md_pages <- self$getSurveyPackageInstanceMetadataPages(study_id = study_id)
+      # Merge pages together in a large dataframe
+      spi_metadata <- private$mergePages(spi_md_pages, "surveypackageinstance")
+      # Unnest the surveys in the survey packages, so each row represents a survey instance
+      si_metadata <- unnest(spi_metadata, `_embedded.survey_instances`, names_sep = "_")
+
+      # Select only relevant columns
+      selected_cols <- c("_embedded.survey_instances__embedded.survey.id",
+                         "participant_id",
+                         "_embedded.survey_instances__embedded.survey.name",
+                         "survey_package_name",
+                         "survey_package_instance_id",
+                         "created_on.date",
+                         "created_by",
+                         "sent_on.date",
+                         "finished_on.date",
+                         "parent_id",
+                         "parent_type")
+
+      name_map <- c(
+        "_embedded.survey_instances__embedded.survey.id" = "survey_instance_id",
+        "_embedded.survey_instances__embedded.survey.name" = "survey_instance_name",
+        "parent_id" = "survey_package_instance_parent_id",
+        "parent_type" = "survey_package_instance_parent_type",
+        "created_on.date" = "created_on",
+        "sent_on.date" = "sent_on",
+        "finished_on.date" = "finished_on"
+      )
+
+      si_metadata <- si_metadata[selected_cols]
+
+      rename_at(si_metadata, names(name_map), ~name_map[.])
+    },
     getSurveyInstances = function(study_id, participant_id = NULL,
                                   id_to_field_name = NULL) {
       self$getSurveyInstancesBulk(study_id, participant_id_ = participant_id,
@@ -337,6 +396,9 @@ CastorData <- R6::R6Class("CastorData",
         return(NULL)
       }
 
+      # Get all survey instances
+      si_metadata <- self$getSurveyInstanceMetadata(study_id_)
+
       # Get survey field ids and names to later clean up the split dataframes
       survey_field_id <- survey_instances %>%
         dplyr::select(field_id, survey_name) %>%
@@ -348,7 +410,6 @@ CastorData <- R6::R6Class("CastorData",
 
       survey_field_id <- split(survey_field_id$field_name, survey_field_id$survey_name)
 
-
       survey_inst_fields <- c("field_id", "survey_instance_id", "field_value",
                               "participant_id", "survey_name")
 
@@ -356,15 +417,18 @@ CastorData <- R6::R6Class("CastorData",
         spread(
           distinct(
             select(survey_instances, survey_instance_id, participant_id, field_id,
-                   survey_name, field_value)),
+                   field_value)),
           field_id, field_value),
-        Participant_ID = participant_id,
-        package_name = survey_name)
+        Participant_ID = participant_id)
 
       if (!is.null(id_to_field_name_)) {
-        survey_data <- rename_at(survey_data, vars(-Participant_ID, -package_name,
+        survey_data <- rename_at(survey_data, vars(-Participant_ID,
                                     -survey_instance_id),
                   ~unlist(id_to_field_name_, recursive = FALSE)[.])}
+
+
+      # Add metadata to survey fields
+      survey_data <- left_join(si_metadata, survey_data, by="survey_instance_id")
 
       attr(survey_data, "survey_field_names") <- survey_field_id
 
@@ -464,8 +528,15 @@ CastorData <- R6::R6Class("CastorData",
                                   field_variable_name, participant_id, field_value)
         study_data_wide <- spread(study_data_long,
                                   field_variable_name, field_value)
-        study_data_compelete_cases <- filter_all(study_data_wide,
+        study_data_complete_cases <- filter_all(study_data_wide,
                                                  any_vars(!is.na(.)))
+
+        # Add randomized on date for studies without randomization
+        # Is not retrieved from API, but needs to exist for further steps
+        if (!("randomized_on.date" %in% names(participant_metadata))) {
+          participant_metadata <- participant_metadata %>%
+            mutate(randomized_on.date = NA_character_)
+        }
 
         rename(
           left_join(
@@ -477,7 +548,7 @@ CastorData <- R6::R6Class("CastorData",
               Randomized_On = randomized_on.date,
               Site_Abbreviation = `_embedded.site.abbreviation`,
               Participant_Creation = created_on.date),
-            study_data_compelete_cases,
+            study_data_complete_cases,
             by="participant_id"
           ),
           Participant_ID = participant_id
@@ -698,7 +769,7 @@ CastorData <- R6::R6Class("CastorData",
         survey_instances <- self$getSurveyInstances(
           study_id = study_id, id_to_field_name = id_to_name)
 
-        survey_fields <- attr(survey_instances, "survey_fields")
+        survey_fields <- attr(survey_instances, "survey_field_names")
 
         if (!is.null(survey_instances)) {
           survey_instances <- self$adjustCheckboxFields(
@@ -708,7 +779,7 @@ CastorData <- R6::R6Class("CastorData",
 
           # Split up in a list of dataframes per survey
           # NB: package_name is a misnomer, should be survey_name
-          survey_instances <- split(survey_instances, f = survey_instances$package_name)
+          survey_instances <- split(survey_instances, f = survey_instances$survey_instance_name)
           survey_names <- names(survey_instances)
           # Only keep relevant fields
           survey_instances <- lapply(names(survey_instances), function(name) {
