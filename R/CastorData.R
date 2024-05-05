@@ -704,11 +704,10 @@ CastorData <- R6::R6Class("CastorData",
 
       if (is.null(all_data_points.df)) {
         warning("No study data available for this study.")
-        fields <- unique(field_info$field_variable_name)
         all_data_points.df <- as.list(
-          rep(NA, length(fields) + length(metadata_fields))
+          rep(NA, length(metadata_fields))
         )
-        names(all_data_points.df) <- append(fields, metadata_fields)
+        names(all_data_points.df) <- metadata_fields
         all_data_points.df <- as.data.frame(all_data_points.df)[NULL, ]
       }
 
