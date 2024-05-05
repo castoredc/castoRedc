@@ -761,6 +761,8 @@ CastorData <- R6::R6Class("CastorData",
 
           names(repeating_data_instances) <- repeating_data_names
           data_list[["Repeating data"]] <- repeating_data_instances
+        } else {
+          data_list[["Repeating data"]] <- NULL
         }
 
       }
