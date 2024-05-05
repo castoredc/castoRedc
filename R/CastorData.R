@@ -797,6 +797,9 @@ CastorData <- R6::R6Class("CastorData",
           names(survey_instances) <- survey_names
 
           data_list[["Surveys"]] <- survey_instances
+        } else {
+          data_list[["Surveys"]] <- NULL
+
         }
       }
 
