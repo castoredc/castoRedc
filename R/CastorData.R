@@ -347,7 +347,7 @@ CastorData <- R6::R6Class("CastorData",
       si_metadata <- unnest(spi_metadata, `_embedded.survey_instances`, names_sep = "_")
 
       # Select only relevant columns
-      selected_cols <- c("_embedded.survey_instances__embedded.survey.id",
+      selected_cols <- c("_embedded.survey_instances_id",
                          "participant_id",
                          "_embedded.survey_instances__embedded.survey.name",
                          "survey_package_name",
@@ -360,8 +360,8 @@ CastorData <- R6::R6Class("CastorData",
                          "parent_type")
 
       name_map <- c(
-        "_embedded.survey_instances__embedded.survey.id" = "survey_instance_id",
-        "_embedded.survey_instances__embedded.survey.name" = "survey_instance_name",
+        "_embedded.survey_instances_id" = "survey_instance_id",
+        "_embedded.survey_instances__embedded.survey.name" = "survey_name",
         "parent_id" = "survey_package_instance_parent_id",
         "parent_type" = "survey_package_instance_parent_type",
         "created_on.date" = "created_on",
