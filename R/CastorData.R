@@ -825,7 +825,7 @@ CastorData <- R6::R6Class("CastorData",
         checkbox_map <- pmap(checkboxes, list) %>%
           set_names(map(., "field_variable_name")) %>%
           imap(~paste0(.$field_variable_name, "#",
-                       .$option_group.options$groupOrder))
+                       .$option_group.options$name))
 
         # the above generates duplicates
         checkbox_map[unique(names(checkbox_map))]
@@ -843,8 +843,15 @@ CastorData <- R6::R6Class("CastorData",
       if (is.null(checkbox_fields) || length(checkbox_vars) == 0)
         return(datapoints)
       else {
+        # Get the link between values and labels for each checkbox field
+        value_to_label_map <- filter(field_info, field_type == "checkbox") %>%
+          pmap(list) %>%
+          set_names(map(., "field_variable_name")) %>%
+          lapply(function(x) x$option_group.options)
+
         checkbox_data <- split_checkboxes(datapoints[checkbox_vars],
-                                          checkbox_field_info = checkbox_fields)
+                                          checkbox_field_info = checkbox_fields,
+                                          value_to_label = value_to_label_map)
         adjusted_data_points <- bind_cols(
           select(datapoints, -one_of(checkbox_vars)),
           checkbox_data)
