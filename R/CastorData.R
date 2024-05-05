@@ -777,7 +777,7 @@ CastorData <- R6::R6Class("CastorData",
 
           # Split up in a list of dataframes per survey
           # NB: package_name is a misnomer, should be survey_name
-          survey_instances <- split(survey_instances, f = survey_instances$survey_instance_name)
+          survey_instances <- split(survey_instances, f = survey_instances$survey_name)
           survey_names <- names(survey_instances)
           # Only keep relevant fields
           survey_instances <- lapply(names(survey_instances), function(name) {
