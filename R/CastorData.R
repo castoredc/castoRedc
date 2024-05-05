@@ -687,27 +687,22 @@ CastorData <- R6::R6Class("CastorData",
           all_data_points.df <- bind_rows(study_data)
         }
       } else {
+        all_data_points.df <- NULL
+      }
+
+      if (is.null(all_data_points.df)) {
         all_data_points.df <- rename(
           select(
             participant_metadata,
             participant_id,
             Randomization_Group = randomization_group,
             Randomization_Group_Name = randomization_group_name,
-            Randomized_On = randomized_on.date,
+            Randomized_On = randomized_on,
             Site_Abbreviation = `_embedded.site.abbreviation`,
             Participant_Creation = created_on.date
           ),
           Participant_ID = participant_id
         )
-      }
-
-      if (is.null(all_data_points.df)) {
-        warning("No study data available for this study.")
-        all_data_points.df <- as.list(
-          rep(NA, length(metadata_fields))
-        )
-        names(all_data_points.df) <- metadata_fields
-        all_data_points.df <- as.data.frame(all_data_points.df)[NULL, ]
       }
 
       adjusted_data_points.df <- self$adjustTypes(
