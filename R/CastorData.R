@@ -772,10 +772,7 @@ CastorData <- R6::R6Class("CastorData",
         survey_fields <- attr(survey_instances, "survey_field_names")
 
         if (!is.null(survey_instances)) {
-          survey_instances <- self$adjustCheckboxFields(
-            survey_instances,
-            filter(field_metadata,
-                   field_variable_name %in% names(survey_instances)))
+          survey_variables <- names(survey_instances)
 
           # Split up in a list of dataframes per survey
           # NB: package_name is a misnomer, should be survey_name
@@ -787,6 +784,15 @@ CastorData <- R6::R6Class("CastorData",
               # Unselect all fields that belong to other repeating data instances
               dplyr::select(-all_of(discard_at(survey_fields, name) %>% unlist(use.names = F)))
           })
+
+          # Adjust checkbox fields
+          survey_instances <- lapply(survey_instances, function(survey) {
+            self$adjustCheckboxFields(
+              survey,
+              filter(field_metadata, field_variable_name %in% survey_variables)
+            )
+          })
+
           names(survey_instances) <- survey_names
 
           data_list[["Surveys"]] <- survey_instances
