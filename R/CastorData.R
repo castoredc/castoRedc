@@ -413,17 +413,16 @@ CastorData <- R6::R6Class("CastorData",
       survey_inst_fields <- c("field_id", "survey_instance_id", "field_value",
                               "participant_id", "survey_name")
 
-      survey_data <- rename(
+      survey_data <-
         spread(
           distinct(
             select(survey_instances, survey_instance_id, participant_id, field_id,
                    field_value)),
-          field_id, field_value),
-        Participant_ID = participant_id)
+          field_id, field_value) %>%
+        select(-participant_id)
 
       if (!is.null(id_to_field_name_)) {
-        survey_data <- rename_at(survey_data, vars(-Participant_ID,
-                                    -survey_instance_id),
+        survey_data <- rename_at(survey_data, vars(-survey_instance_id),
                   ~unlist(id_to_field_name_, recursive = FALSE)[.])}
 
 
