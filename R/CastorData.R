@@ -347,7 +347,7 @@ CastorData <- R6::R6Class("CastorData",
       si_metadata <- unnest(spi_metadata, `_embedded.survey_instances`, names_sep = "_")
 
       # Select only relevant columns
-      selected_cols <- c("_embedded.survey_instances__embedded.survey.id",
+      selected_cols <- c("_embedded.survey_instances_id",
                          "participant_id",
                          "_embedded.survey_instances__embedded.survey.name",
                          "survey_package_name",
@@ -360,8 +360,8 @@ CastorData <- R6::R6Class("CastorData",
                          "parent_type")
 
       name_map <- c(
-        "_embedded.survey_instances__embedded.survey.id" = "survey_instance_id",
-        "_embedded.survey_instances__embedded.survey.name" = "survey_instance_name",
+        "_embedded.survey_instances_id" = "survey_instance_id",
+        "_embedded.survey_instances__embedded.survey.name" = "survey_name",
         "parent_id" = "survey_package_instance_parent_id",
         "parent_type" = "survey_package_instance_parent_type",
         "created_on.date" = "created_on",
@@ -413,17 +413,16 @@ CastorData <- R6::R6Class("CastorData",
       survey_inst_fields <- c("field_id", "survey_instance_id", "field_value",
                               "participant_id", "survey_name")
 
-      survey_data <- rename(
+      survey_data <-
         spread(
           distinct(
             select(survey_instances, survey_instance_id, participant_id, field_id,
                    field_value)),
-          field_id, field_value),
-        Participant_ID = participant_id)
+          field_id, field_value) %>%
+        select(-participant_id)
 
       if (!is.null(id_to_field_name_)) {
-        survey_data <- rename_at(survey_data, vars(-Participant_ID,
-                                    -survey_instance_id),
+        survey_data <- rename_at(survey_data, vars(-survey_instance_id),
                   ~unlist(id_to_field_name_, recursive = FALSE)[.])}
 
 
@@ -688,28 +687,22 @@ CastorData <- R6::R6Class("CastorData",
           all_data_points.df <- bind_rows(study_data)
         }
       } else {
+        all_data_points.df <- NULL
+      }
+
+      if (is.null(all_data_points.df)) {
         all_data_points.df <- rename(
           select(
             participant_metadata,
             participant_id,
             Randomization_Group = randomization_group,
             Randomization_Group_Name = randomization_group_name,
-            Randomized_On = randomized_on.date,
+            Randomized_On = randomized_on,
             Site_Abbreviation = `_embedded.site.abbreviation`,
             Participant_Creation = created_on.date
           ),
           Participant_ID = participant_id
         )
-      }
-
-      if (is.null(all_data_points.df)) {
-        warning("No study data available for this study.")
-        fields <- unique(field_info$field_variable_name)
-        all_data_points.df <- as.list(
-          rep(NA, length(fields) + length(metadata_fields))
-        )
-        names(all_data_points.df) <- append(fields, metadata_fields)
-        all_data_points.df <- as.data.frame(all_data_points.df)[NULL, ]
       }
 
       adjusted_data_points.df <- self$adjustTypes(
@@ -762,6 +755,8 @@ CastorData <- R6::R6Class("CastorData",
 
           names(repeating_data_instances) <- repeating_data_names
           data_list[["Repeating data"]] <- repeating_data_instances
+        } else {
+          data_list[["Repeating data"]] <- NULL
         }
 
       }
@@ -772,14 +767,11 @@ CastorData <- R6::R6Class("CastorData",
         survey_fields <- attr(survey_instances, "survey_field_names")
 
         if (!is.null(survey_instances)) {
-          survey_instances <- self$adjustCheckboxFields(
-            survey_instances,
-            filter(field_metadata,
-                   field_variable_name %in% names(survey_instances)))
+          survey_variables <- names(survey_instances)
 
           # Split up in a list of dataframes per survey
           # NB: package_name is a misnomer, should be survey_name
-          survey_instances <- split(survey_instances, f = survey_instances$survey_instance_name)
+          survey_instances <- split(survey_instances, f = survey_instances$survey_name)
           survey_names <- names(survey_instances)
           # Only keep relevant fields
           survey_instances <- lapply(names(survey_instances), function(name) {
@@ -787,9 +779,21 @@ CastorData <- R6::R6Class("CastorData",
               # Unselect all fields that belong to other repeating data instances
               dplyr::select(-all_of(discard_at(survey_fields, name) %>% unlist(use.names = F)))
           })
+
+          # Adjust checkbox fields
+          survey_instances <- lapply(survey_instances, function(survey) {
+            self$adjustCheckboxFields(
+              survey,
+              filter(field_metadata, field_variable_name %in% survey_variables)
+            )
+          })
+
           names(survey_instances) <- survey_names
 
           data_list[["Surveys"]] <- survey_instances
+        } else {
+          data_list[["Surveys"]] <- NULL
+
         }
       }
 
@@ -815,7 +819,7 @@ CastorData <- R6::R6Class("CastorData",
         checkbox_map <- pmap(checkboxes, list) %>%
           set_names(map(., "field_variable_name")) %>%
           imap(~paste0(.$field_variable_name, "#",
-                       .$option_group.options$groupOrder))
+                       .$option_group.options$name))
 
         # the above generates duplicates
         checkbox_map[unique(names(checkbox_map))]
@@ -833,8 +837,15 @@ CastorData <- R6::R6Class("CastorData",
       if (is.null(checkbox_fields) || length(checkbox_vars) == 0)
         return(datapoints)
       else {
+        # Get the link between values and labels for each checkbox field
+        value_to_label_map <- filter(field_info, field_type == "checkbox") %>%
+          pmap(list) %>%
+          set_names(map(., "field_variable_name")) %>%
+          lapply(function(x) x$option_group.options)
+
         checkbox_data <- split_checkboxes(datapoints[checkbox_vars],
-                                          checkbox_field_info = checkbox_fields)
+                                          checkbox_field_info = checkbox_fields,
+                                          value_to_label = value_to_label_map)
         adjusted_data_points <- bind_cols(
           select(datapoints, -one_of(checkbox_vars)),
           checkbox_data)

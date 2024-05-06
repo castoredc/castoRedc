@@ -86,13 +86,13 @@ study <- castor_api$getStudyData(example_study_id)
 <tr>
 <td>
 
-|      | Participant_ID | Site_Abbreviation | Randomization_Group | Participant_Creation | ic_date    | ic_versions#1 | ic_versions#0 | ic_main_version | ic_language#0 | ic_language#1 |
-|:-----|:---------------|:------------------|:--------------------|:---------------------|:-----------|:--------------|:--------------|:----------------|:--------------|:--------------|
-| 1    | 110001         | FGV               | NA                  | 2021-06-22 09:51:49  | 2021-06-22 | TRUE          | FALSE         | 2.5             | FALSE         | FALSE         |
-| 2    | 110002         | FGV               | NA                  | 2021-06-22 09:59:01  | NA         | FALSE         | FALSE         | NA              | FALSE         | FALSE         |
-| NA   | NA             | NA                | NA                  | NA                   | NA         | NA            | NA            | NA              | NA            | NA            |
-| NA.1 | NA             | NA                | NA                  | NA                   | NA         | NA            | NA            | NA              | NA            | NA            |
-| NA.2 | NA             | NA                | NA                  | NA                   | NA         | NA            | NA            | NA              | NA            | NA            |
+|      | Participant_ID | Site_Abbreviation | Randomization_Group | Participant_Creation | ic_date    | ic_versions#Other | ic_versions#Main study CF | ic_main_version | ic_language#English | ic_language#Dutch |
+|:-----|:---------------|:------------------|:--------------------|:---------------------|:-----------|:------------------|:--------------------------|:----------------|:--------------------|:------------------|
+| 1    | 110001         | FGV               | NA                  | 2021-06-22 09:51:49  | 2021-06-22 | FALSE             | FALSE                     | 2.5             | FALSE               | FALSE             |
+| 2    | 110002         | FGV               | NA                  | 2021-06-22 09:59:01  | NA         | FALSE             | FALSE                     | NA              | FALSE               | FALSE             |
+| NA   | NA             | NA                | NA                  | NA                   | NA         | NA                | NA                        | NA              | NA                  | NA                |
+| NA.1 | NA             | NA                | NA                  | NA                   | NA         | NA                | NA                        | NA              | NA                  | NA                |
+| NA.2 | NA             | NA                | NA                  | NA                   | NA         | NA                | NA                        | NA              | NA                  | NA                |
 
 </td>
 <td>
@@ -139,9 +139,11 @@ study <- castor_api$getStudyData(example_study_id)
 <tr>
 <td>
 
-| survey_instance_id                   | Participant_ID | package_name | SF12_12 | SF12_2 | SF12_1    | VAS   | SF12_3 |
-|:-------------------------------------|:---------------|:-------------|:--------|:-------|:----------|:------|:-------|
-| 4FF130AD-274C-4C8F-A4A0-A7816A5A88E9 | 110001         | QOL Survey   | Rarely  | Mostly | Excellent | 85.00 | Mostly |
+| survey_instance_id                   | participant_id | survey_name | survey_package_name     | survey_package_instance_id           | created_on                 | created_by                           | sent_on                    | finished_on                | survey_package_instance_parent_id | survey_package_instance_parent_type | SF12_12 | SF12_2 | SF12_1    | VAS   | SF12_3 |
+|:-------------------------------------|:---------------|:------------|:------------------------|:-------------------------------------|:---------------------------|:-------------------------------------|:---------------------------|:---------------------------|:----------------------------------|:------------------------------------|:--------|:-------|:----------|:------|:-------|
+| 4FF130AD-274C-4C8F-A4A0-A7816A5A88E9 | 110001         | QOL Survey  | My first survey package | 0761A9BA-9802-483D-8EB3-D07233A56F2B | 2021-06-22 10:12:19.000000 | B23ABCC4-3A53-FB32-7B78-3960CC907F25 | 2021-06-22 10:12:19.000000 | 2021-06-22 10:12:44.000000 |                                   | 0                                   | Rarely  | Mostly | Excellent | 85.00 | Mostly |
+| B99F0082-1B20-456B-8D4D-47D16867B211 | 110001         | QOL Survey  | My first survey package | 5B3FE56F-89FA-4C6D-A638-E8FA46113EB0 | 2021-06-22 10:13:01.000000 | B23ABCC4-3A53-FB32-7B78-3960CC907F25 | 2021-06-22 10:13:01.000000 | NA                         |                                   | 0                                   | NA      | NA     | NA        | NA    | NA     |
+| 29FD41EF-46F1-4DEA-A372-F38FC2C0C9C2 | 110001         | QOL Survey  | My first survey package | EBBB77D0-56A2-49C7-9333-A27C17FA5D95 | 2021-09-24 13:12:45.000000 | B23ABCC4-3A53-FB32-7B78-3960CC907F25 | 2021-09-24 13:12:45.000000 | NA                         |                                   | 0                                   | NA      | NA     | NA        | NA    | NA     |
 
 </td>
 </tr>

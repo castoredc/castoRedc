@@ -61,7 +61,7 @@ map_value_label = function(value_vector, link_list) {
 
 
 #' @importFrom stats setNames
-split_checkbox <- function(values, field_info, sep_ = ";") {
+split_checkbox <- function(values, field_info, value_to_label, sep_ = ";") {
   #cat("checkbox values:\n")
   #print(values)
   #cat("checkbox field info:\n")
@@ -78,6 +78,17 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
   } else {
     values <- rep(NA, num_vals)
   }
+
+  # Loop over each value in each column
+  # Replace value with label
+  # If value is NA, replace with NA
+  values <- map(values, function(x)
+    map(x, function(y)
+      ifelse(
+        is.na(y),
+        NA_character_,
+        value_to_label %>% filter(value == y) %>% pull(name)
+      )) %>% unlist())
 
   field <- names(field_info)
 
@@ -111,10 +122,10 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
   select(checkbox_result, one_of(field_info[[field]]))
 }
 
-split_checkboxes <- function(checkbox_data, checkbox_field_info, sep = ";") {
+split_checkboxes <- function(checkbox_data, checkbox_field_info, value_to_label, sep = ";") {
   bind_cols(
     imap(checkbox_data, function(field_data, field) {
-      split_checkbox(field_data, checkbox_field_info[field], sep)
+      split_checkbox(field_data, checkbox_field_info[field], value_to_label[[field]], sep)
     })
   )
 }
