@@ -1,16 +1,16 @@
 Package: castoRedc
 Title: Wraps Castor API for easy data access
-Version: 1.1.0
+Version: 2.0.0
 Authors@R: c(
     person("Thomas", "Johnson", role = "aut"),
     person("Reinier", "van Linschoten",
-           role = "aut", comment = "Castor Helpdesk"),
+           role = "aut"),
     person("Castor Support", email = "support@castoredc.com",
            role = "cre", comment = "Castor Helpdesk"),
     person("Castor EDC", role = "cph")
     )
 Description: A package that wraps a few of the endpoints for the Castor API.
-Depends: R (>= 3.1.0)
+Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 URL: https://github.com/castoredc/castoRedc
 BugReports: https://github.com/castoredc/castoRedc/issues
@@ -27,7 +27,7 @@ Imports:
 Suggests:
     knitr,
     testthat
-RoxygenNote: 6.1.1
+RoxygenNote: 7.3.0
 Collate:
     'imports.R'
     'utils.R'

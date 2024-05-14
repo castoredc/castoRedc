@@ -1,12 +1,71 @@
 #' @include imports.R
 NULL
 
+
+#' transform_missings
+#'
+#' Transforms character missing values to the respective negative numeric values
+#'
+#' @param value The value in the Castor database
+#' @return The value, or the respective missing value if the value was missing
+#' @export
+transform_missings = function(value) {
+  case_when(
+    value == "##USER_MISSING_95##" ~ "-95",
+    value == "##USER_MISSING_96##" ~ "-96",
+    value == "##USER_MISSING_97##" ~ "-97",
+    value == "##USER_MISSING_98##" ~ "-98",
+    value == "##USER_MISSING_99##" ~ "-99",
+    .default = value
+  )
+}
+
+#' transform_missings_date
+#'
+#' Transforms character missing values to the respective negative numeric values for date variables
+#'
+#' @param value The value in the Castor database
+#' @return The value, or the respective missing value if the value was missing
+#' @export
+transform_missings_date = function(value) {
+  case_when(
+    value == "##USER_MISSING_95##" ~ "31-12-2995",
+    value == "##USER_MISSING_96##" ~ "31-12-2996",
+    value == "##USER_MISSING_97##" ~ "31-12-2997",
+    value == "##USER_MISSING_98##" ~ "31-12-2998",
+    value == "##USER_MISSING_99##" ~ "31-12-2999",
+    .default = value
+  )
+}
+
+#' map_value_label
+#'
+#' Maps a vector of values to labels given the value label link
+#'
+#' @param value_vector The vector with values
+#' @param link_list A list with values as names and labels as items
+#' @return A vector with labels
+#' @export
+map_value_label = function(value_vector, link_list) {
+  as.factor(sapply(value_vector, function(x) {
+    # Get matching value
+    result <- link_list[[as.character(x)]]
+    # If no matching value (NA) then return NA
+    if (is.null(result)) {
+      NA
+    } else {
+      result
+    }
+  }))
+}
+
+
 #' @importFrom stats setNames
-split_checkbox <- function(values, field_info, sep_ = ";") {
-  cat("checkbox values:\n")
-  print(values)
-  cat("checkbox field info:\n")
-  print(field_info)
+split_checkbox <- function(values, field_info, value_to_label, sep_ = ";") {
+  #cat("checkbox values:\n")
+  #print(values)
+  #cat("checkbox field info:\n")
+  #print(field_info)
   num_vals <- length(values)
   if (num_vals > 0) {
     values <- strsplit(values, sep_)
@@ -19,6 +78,17 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
   } else {
     values <- rep(NA, num_vals)
   }
+
+  # Loop over each value in each column
+  # Replace value with label
+  # If value is NA, replace with NA
+  values <- map(values, function(x)
+    map(x, function(y)
+      ifelse(
+        is.na(y),
+        NA_character_,
+        value_to_label %>% filter(value == y) %>% pull(name)
+      )) %>% unlist())
 
   field <- names(field_info)
 
@@ -52,10 +122,10 @@ split_checkbox <- function(values, field_info, sep_ = ";") {
   select(checkbox_result, one_of(field_info[[field]]))
 }
 
-split_checkboxes <- function(checkbox_data, checkbox_field_info, sep = ";") {
+split_checkboxes <- function(checkbox_data, checkbox_field_info, value_to_label, sep = ";") {
   bind_cols(
     imap(checkbox_data, function(field_data, field) {
-      split_checkbox(field_data, checkbox_field_info[field], sep)
+      split_checkbox(field_data, checkbox_field_info[field], value_to_label[[field]], sep)
     })
   )
 }

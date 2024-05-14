@@ -5,11 +5,12 @@
 \alias{CastorData-class}
 \alias{CastorData}
 \title{Class used to access Castor REST API.}
-\format{An R6 class object.}
-\usage{
-CastorData
+\format{
+An R6 class object.
 }
 \description{
+Class used to access Castor REST API.
+
 Class used to access Castor REST API.
 }
 \section{Methods}{
@@ -19,17 +20,32 @@ Class used to access Castor REST API.
  \item \code{getFields(study_id, include, page): Gets all fields for a given
  study.
  }
- \item \code{getRecords(study_id): Gets all records for a given
+ \item \code{getParticipants(study_id): Gets all participants for a given
  study.
  }
- \item \code{getStudyDataPoints(study_id, record_id,
+ \item \code{getStudyDataPoints(study_id, participant_id,
                                 filter_types): Gets all data points
- for a given study and record. Filter types may be supplied for fields types
+ for a given study and participant. Filter types may be supplied for fields types
  as a character vector of field types.
  }
- \item \code{getStudyData(study_id, filter_types): creates a data
- frame with all data points for a given study with each row representing a
- record and each column a field.
+ \item \code{getStudyData(study_id,
+                          load_study_data,
+                          repeating_data_instances,
+                          survey_instances,
+                          translate_option_values,
+                          filter_types):
+ creates a named nested list with a dataframe for all study data, a
+ list of dataframes for repeating data instances and a list of dataframes
+ for survey instances. Can toggle which data is extracted, and whether
+ option group values are translated to labels.
+ }
+ \item \code{getOptionGroups(study_id): creates a data
+ frame with all option groups for a given study with each row representing an
+ option group.
+ }
+ \item \code{getRepeatingDataInstancesByParticipant(study_id, participant_id): creates a data
+ frame with all repeating data for a given participant with each row
+ representing a field.
  }
  \item \code{adjustTypes = function(field_to_type, values,
                                     type_to_func): Utility method
@@ -37,7 +53,416 @@ Class used to access Castor REST API.
  of data type : function (for casting the data) mappings on instantiation of
  this class, CastorAPIWrapper.
  }
+ \item \code{transformOptionGroups = function(dataframe, study_id): Utility method
+ for transforming a dataframe with option group values to the correct labels.
+ }
 }
 }
 
 \keyword{internal}
+\section{Super class}{
+\code{\link[castoRedc:CastorAPIWrapper]{castoRedc::CastorAPIWrapper}} -> \code{CastorData}
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-CastorData-getStudies}{\code{CastorData$getStudies()}}
+\item \href{#method-CastorData-getUsers}{\code{CastorData$getUsers()}}
+\item \href{#method-CastorData-getForms}{\code{CastorData$getForms()}}
+\item \href{#method-CastorData-getFields}{\code{CastorData$getFields()}}
+\item \href{#method-CastorData-getVisits}{\code{CastorData$getVisits()}}
+\item \href{#method-CastorData-getSurveys}{\code{CastorData$getSurveys()}}
+\item \href{#method-CastorData-getSurveyPackages}{\code{CastorData$getSurveyPackages()}}
+\item \href{#method-CastorData-getSurveyPackageInstances}{\code{CastorData$getSurveyPackageInstances()}}
+\item \href{#method-CastorData-getRepeatingDatas}{\code{CastorData$getRepeatingDatas()}}
+\item \href{#method-CastorData-getRepeatingDataForms}{\code{CastorData$getRepeatingDataForms()}}
+\item \href{#method-CastorData-getParticipants}{\code{CastorData$getParticipants()}}
+\item \href{#method-CastorData-getStudyDataPointsBulkByParticipant}{\code{CastorData$getStudyDataPointsBulkByParticipant()}}
+\item \href{#method-CastorData-getStudyDataPointsBulk}{\code{CastorData$getStudyDataPointsBulk()}}
+\item \href{#method-CastorData-getOptionGroups}{\code{CastorData$getOptionGroups()}}
+\item \href{#method-CastorData-getRepeatingDataInstancesByParticipant}{\code{CastorData$getRepeatingDataInstancesByParticipant()}}
+\item \href{#method-CastorData-getRepeatingDataInstances}{\code{CastorData$getRepeatingDataInstances()}}
+\item \href{#method-CastorData-getRepeatingDataInstancesBulk}{\code{CastorData$getRepeatingDataInstancesBulk()}}
+\item \href{#method-CastorData-getRepeatingDataInstanceMetadata}{\code{CastorData$getRepeatingDataInstanceMetadata()}}
+\item \href{#method-CastorData-getSurveyInstances}{\code{CastorData$getSurveyInstances()}}
+\item \href{#method-CastorData-getSurveyInstancesBulk}{\code{CastorData$getSurveyInstancesBulk()}}
+\item \href{#method-CastorData-getSurveyInstanceBulk}{\code{CastorData$getSurveyInstanceBulk()}}
+\item \href{#method-CastorData-getSurveyPackageInstanceBulk}{\code{CastorData$getSurveyPackageInstanceBulk()}}
+\item \href{#method-CastorData-getStudyDataPoints}{\code{CastorData$getStudyDataPoints()}}
+\item \href{#method-CastorData-getStudyDataBulk}{\code{CastorData$getStudyDataBulk()}}
+\item \href{#method-CastorData-getFieldInfo}{\code{CastorData$getFieldInfo()}}
+\item \href{#method-CastorData-generateFieldMetadata}{\code{CastorData$generateFieldMetadata()}}
+\item \href{#method-CastorData-getStudyData}{\code{CastorData$getStudyData()}}
+\item \href{#method-CastorData-generateCheckboxFields}{\code{CastorData$generateCheckboxFields()}}
+\item \href{#method-CastorData-adjustCheckboxFields}{\code{CastorData$adjustCheckboxFields()}}
+\item \href{#method-CastorData-adjustTypes}{\code{CastorData$adjustTypes()}}
+\item \href{#method-CastorData-transformOptionGroups}{\code{CastorData$transformOptionGroups()}}
+\item \href{#method-CastorData-clone}{\code{CastorData$clone()}}
+}
+}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="castorOAuth"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-castorOAuth'><code>castoRedc::CastorAPIWrapper$castorOAuth()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="collectPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-collectPages'><code>castoRedc::CastorAPIWrapper$collectPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getField"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getField'><code>castoRedc::CastorAPIWrapper$getField()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getFieldsPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getFieldsPages'><code>castoRedc::CastorAPIWrapper$getFieldsPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getForm"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getForm'><code>castoRedc::CastorAPIWrapper$getForm()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getFormsPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getFormsPages'><code>castoRedc::CastorAPIWrapper$getFormsPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getParticipant"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getParticipant'><code>castoRedc::CastorAPIWrapper$getParticipant()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getParticipantsPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getParticipantsPages'><code>castoRedc::CastorAPIWrapper$getParticipantsPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getRepeatingData"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getRepeatingData'><code>castoRedc::CastorAPIWrapper$getRepeatingData()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getRepeatingDataForm"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getRepeatingDataForm'><code>castoRedc::CastorAPIWrapper$getRepeatingDataForm()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getRepeatingDataFormsPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getRepeatingDataFormsPages'><code>castoRedc::CastorAPIWrapper$getRepeatingDataFormsPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getRepeatingDataInstanceMetadataPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getRepeatingDataInstanceMetadataPages'><code>castoRedc::CastorAPIWrapper$getRepeatingDataInstanceMetadataPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getRepeatingDatasPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getRepeatingDatasPages'><code>castoRedc::CastorAPIWrapper$getRepeatingDatasPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getRequest"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getRequest'><code>castoRedc::CastorAPIWrapper$getRequest()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getStudiesPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getStudiesPages'><code>castoRedc::CastorAPIWrapper$getStudiesPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getStudy"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getStudy'><code>castoRedc::CastorAPIWrapper$getStudy()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getStudyDataPoint"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getStudyDataPoint'><code>castoRedc::CastorAPIWrapper$getStudyDataPoint()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getStudyDataPointsPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getStudyDataPointsPages'><code>castoRedc::CastorAPIWrapper$getStudyDataPointsPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getSurvey"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getSurvey'><code>castoRedc::CastorAPIWrapper$getSurvey()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getSurveyPackage"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getSurveyPackage'><code>castoRedc::CastorAPIWrapper$getSurveyPackage()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getSurveyPackageInstance"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getSurveyPackageInstance'><code>castoRedc::CastorAPIWrapper$getSurveyPackageInstance()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getSurveyPackageInstancesPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getSurveyPackageInstancesPages'><code>castoRedc::CastorAPIWrapper$getSurveyPackageInstancesPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getSurveyPackagesPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getSurveyPackagesPages'><code>castoRedc::CastorAPIWrapper$getSurveyPackagesPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getSurveysPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getSurveysPages'><code>castoRedc::CastorAPIWrapper$getSurveysPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getUsersPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getUsersPages'><code>castoRedc::CastorAPIWrapper$getUsersPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getVisit"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getVisit'><code>castoRedc::CastorAPIWrapper$getVisit()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="getVisitsPages"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-getVisitsPages'><code>castoRedc::CastorAPIWrapper$getVisitsPages()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="castoRedc" data-topic="CastorAPIWrapper" data-id="initialize"><a href='../../castoRedc/html/CastorAPIWrapper.html#method-CastorAPIWrapper-initialize'><code>castoRedc::CastorAPIWrapper$initialize()</code></a></span></li>
+</ul>
+</details>
+}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getStudies"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getStudies}{}}}
+\subsection{Method \code{getStudies()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getStudies()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getUsers"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getUsers}{}}}
+\subsection{Method \code{getUsers()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getUsers()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getForms"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getForms}{}}}
+\subsection{Method \code{getForms()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getForms(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getFields"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getFields}{}}}
+\subsection{Method \code{getFields()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getFields(study_id, include = "optiongroup")}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getVisits"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getVisits}{}}}
+\subsection{Method \code{getVisits()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getVisits(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveys"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveys}{}}}
+\subsection{Method \code{getSurveys()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveys(study_id, include = "forms", page = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveyPackages"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveyPackages}{}}}
+\subsection{Method \code{getSurveyPackages()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveyPackages(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveyPackageInstances"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveyPackageInstances}{}}}
+\subsection{Method \code{getSurveyPackageInstances()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveyPackageInstances(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getRepeatingDatas"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getRepeatingDatas}{}}}
+\subsection{Method \code{getRepeatingDatas()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getRepeatingDatas(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getRepeatingDataForms"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getRepeatingDataForms}{}}}
+\subsection{Method \code{getRepeatingDataForms()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getRepeatingDataForms(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getParticipants"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getParticipants}{}}}
+\subsection{Method \code{getParticipants()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getParticipants(study_id, filter_archived = TRUE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getStudyDataPointsBulkByParticipant"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getStudyDataPointsBulkByParticipant}{}}}
+\subsection{Method \code{getStudyDataPointsBulkByParticipant()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getStudyDataPointsBulkByParticipant(study_id, participant_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getStudyDataPointsBulk"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getStudyDataPointsBulk}{}}}
+\subsection{Method \code{getStudyDataPointsBulk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getStudyDataPointsBulk(study_id_ = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getOptionGroups"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getOptionGroups}{}}}
+\subsection{Method \code{getOptionGroups()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getOptionGroups(study_id = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getRepeatingDataInstancesByParticipant"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getRepeatingDataInstancesByParticipant}{}}}
+\subsection{Method \code{getRepeatingDataInstancesByParticipant()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getRepeatingDataInstancesByParticipant(study_id, participant_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getRepeatingDataInstances"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getRepeatingDataInstances}{}}}
+\subsection{Method \code{getRepeatingDataInstances()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getRepeatingDataInstances(
+  study_id,
+  participant_id = NULL,
+  id_to_field_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getRepeatingDataInstancesBulk"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getRepeatingDataInstancesBulk}{}}}
+\subsection{Method \code{getRepeatingDataInstancesBulk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getRepeatingDataInstancesBulk(
+  study_id_,
+  participant_id_ = NULL,
+  id_to_field_name_ = NULL,
+  page_size = NULL
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getRepeatingDataInstanceMetadata"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getRepeatingDataInstanceMetadata}{}}}
+\subsection{Method \code{getRepeatingDataInstanceMetadata()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getRepeatingDataInstanceMetadata(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveyInstances"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveyInstances}{}}}
+\subsection{Method \code{getSurveyInstances()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveyInstances(
+  study_id,
+  participant_id = NULL,
+  id_to_field_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveyInstancesBulk"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveyInstancesBulk}{}}}
+\subsection{Method \code{getSurveyInstancesBulk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveyInstancesBulk(
+  study_id_,
+  participant_id_ = NULL,
+  id_to_field_name_ = NULL
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveyInstanceBulk"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveyInstanceBulk}{}}}
+\subsection{Method \code{getSurveyInstanceBulk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveyInstanceBulk(study_id, participant_id, survey_instance_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getSurveyPackageInstanceBulk"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getSurveyPackageInstanceBulk}{}}}
+\subsection{Method \code{getSurveyPackageInstanceBulk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getSurveyPackageInstanceBulk(
+  study_id,
+  participant_id,
+  survey_package_instance_id
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getStudyDataPoints"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getStudyDataPoints}{}}}
+\subsection{Method \code{getStudyDataPoints()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getStudyDataPoints(
+  study_id,
+  participant_id = NULL,
+  filter_types = NULL,
+  bulk_by_participant = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getStudyDataBulk"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getStudyDataBulk}{}}}
+\subsection{Method \code{getStudyDataBulk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getStudyDataBulk(study_id., field_info., participant_metadata)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getFieldInfo"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getFieldInfo}{}}}
+\subsection{Method \code{getFieldInfo()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getFieldInfo(study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-generateFieldMetadata"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-generateFieldMetadata}{}}}
+\subsection{Method \code{generateFieldMetadata()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$generateFieldMetadata(study_id, field_info)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-getStudyData"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-getStudyData}{}}}
+\subsection{Method \code{getStudyData()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$getStudyData(
+  study_id,
+  bulk = TRUE,
+  load_study_data = TRUE,
+  repeating_data_instances = TRUE,
+  survey_instances = TRUE,
+  translate_option_values = TRUE,
+  filter_types = c("remark", "image", "summary", "upload", "repeated_measures",
+    "add_repeating_data_button")
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-generateCheckboxFields"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-generateCheckboxFields}{}}}
+\subsection{Method \code{generateCheckboxFields()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$generateCheckboxFields(field_info, checkboxes = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-adjustCheckboxFields"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-adjustCheckboxFields}{}}}
+\subsection{Method \code{adjustCheckboxFields()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$adjustCheckboxFields(datapoints, field_info, checkbox_fields = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-adjustTypes"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-adjustTypes}{}}}
+\subsection{Method \code{adjustTypes()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$adjustTypes(study_data, field_metadata, type_to_func, filter_types)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-transformOptionGroups"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-transformOptionGroups}{}}}
+\subsection{Method \code{transformOptionGroups()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$transformOptionGroups(dataframe, study_id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CastorData-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CastorData-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CastorData$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}

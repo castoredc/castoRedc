@@ -12,6 +12,8 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
+library(tidyverse)
+
 credentials <- readRDS("tests/testthat/testing_credentials.Rds")
 ```
 # Castor API R Package
@@ -30,6 +32,13 @@ Access to data in the API comes in three forms:
 # install.packages("remotes")
 remotes::install_github("castoredc/castoRedc")
 ```
+
+## Missing data
+
+In the package, user missing data is handled in the following way.
+For date variables, they are represented by 31-12-29XX, where XX (95-99) indicates the type of missing data.
+For numeric variables, they are represented by the values -99 to -95, where 95 to 99 represent the type of missing data in Castor.
+For non-numeric variables, they are represented by ##_USER_MISSING_XX## where XX (95-99) indicates the type of missing data.
 
 ## Testing
 
@@ -65,6 +74,30 @@ knitr::kable(studies)
 (example_study_id <- studies[["study_id"]][1])
 ```
 
+```{r message=FALSE}
+study <- castor_api$getStudyData(example_study_id)
+```
+
+```{r echo=FALSE, results='asis'}
+study[["Study"]] <- study[["Study"]][1:5,1:10]
+study[["Repeating data"]] <-
+  lapply(study[["Repeating data"]], function(x)
+    x %>%
+      rowwise() %>%
+      mutate(missing = sum(is.na(
+        c_across(everything())
+      ))) %>% ungroup() %>% slice_min(missing, n = 5, with_ties = F) %>% select(!missing))
+study[["Surveys"]] <-
+  lapply(study[["Surveys"]], function(x)
+    x %>%
+      rowwise() %>%
+      mutate(missing = sum(is.na(
+        c_across(everything())
+      ))) %>% ungroup() %>% slice_min(missing, n = 5, with_ties = F) %>% select(!missing))
+
+knitr::kable(study)
+```
+
 
 ```{r message=FALSE}
 fields <- castor_api$getFields(example_study_id)
@@ -75,17 +108,17 @@ knitr::kable(head(subset(fields, select = -field_summary_template), 3))
 
 
 ```{r message=FALSE}
-steps <- castor_api$getSteps(example_study_id)
+forms <- castor_api$getForms(example_study_id)
 ```
 ```{r echo=FALSE, results='asis'}
-knitr::kable(steps)
+knitr::kable(forms)
 ```
 
 
 ```{r message=FALSE}
-phases <- castor_api$getPhases(example_study_id)
+visits <- castor_api$getVisits(example_study_id)
 ```
 ```{r echo=FALSE, results='asis'}
-knitr::kable(phases)
+knitr::kable(visits)
 ```
 
