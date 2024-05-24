@@ -97,7 +97,8 @@ split_checkbox <- function(values, field_info, value_to_label, sep_ = ";") {
       bind_rows(
         lapply(values, function(value) {
           checkboxes <- as.data.frame(split(rep(TRUE, length(value)),
-                                            paste0(field, ".", value)))
+                                            paste0(field, ".", value)),
+                                      check.names = FALSE)
           if (nrow(checkboxes) > 0)
             checkboxes
           else
