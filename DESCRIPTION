@@ -20,7 +20,7 @@ Imports:
     httr,
     jsonlite,
     R6,
-    purrr,
+    purrr (>= 1.0.0),
     dplyr,
     tidyr,
     glue
