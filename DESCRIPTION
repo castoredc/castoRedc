@@ -1,6 +1,6 @@
 Package: castoRedc
 Title: Wraps Castor API for easy data access
-Version: 2.0.1
+Version: 2.1.0
 Authors@R: c(
     person("Thomas", "Johnson", role = "aut"),
     person("Reinier", "van Linschoten",
@@ -26,10 +26,11 @@ Imports:
     glue
 Suggests:
     knitr,
-    testthat
+    testthat (>= 3.0.0)
 RoxygenNote: 7.3.0
 Collate:
     'imports.R'
     'utils.R'
     'CastorData.R'
     'CastorAPIWrapper.R'
+Config/testthat/edition: 3
