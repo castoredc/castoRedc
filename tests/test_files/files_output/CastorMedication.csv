@@ -1,3 +1,3 @@
-record_id,institute,created_on,custom_name,parent,archived,med_name,med_start,med_stop,med_dose,med_units,med_other_unit
+participant_id,institute,created_on,custom_name,parent,archived,med_name,med_start,med_stop,med_dose,med_units,med_other_unit
 110001,Franciscus Gasthuis & Vlietland,22-06-2021 09:54:28,Medication - 22-06-2021 09:54:28,Unscheduled visits and Medication,FALSE,Diclofenac,25-06-2021,28-06-2021,150,mg/day,
 110001,Franciscus Gasthuis & Vlietland,22-06-2021 09:58:27,Medication - 22-06-2021 09:58:26,No parent,FALSE,,,,,,
