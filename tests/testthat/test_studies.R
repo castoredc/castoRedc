@@ -1,4 +1,4 @@
-# Needs updates to tests
+# TODO: Needs updates to tests
 context("Test Study related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
