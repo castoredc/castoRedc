@@ -26,13 +26,13 @@ test_that("getParticipantsPages returns an appropriate object when retrieving a 
 })
 
 test_that("getParticipantsPages fails appropriately", {
-  error1 <- expect_error(castor_api$getParticipantsPages(creds$example_study, page = -1))
+  error1 <- expect_error(castor_api$getParticipantsPages(creds$output_study, page = -1))
   expect_match(error1$message, "Error code: 400")
 
-  error2 <- expect_error(castor_api$getParticipantsPages(creds$example_study, page = 100000000))
+  error2 <- expect_error(castor_api$getParticipantsPages(creds$output_study, page = 100000000))
   expect_match(error2$message, "Error code: 409")
 
-  error3 <- expect_error(castor_api$getParticipantsPages(creds$example_study, page = pi))
+  error3 <- expect_error(castor_api$getParticipantsPages(creds$output_study, page = pi))
   expect_match(error3$message, "page must be an integer")
 })
 
