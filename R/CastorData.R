@@ -67,16 +67,35 @@ CastorData <- R6::R6Class("CastorData",
       private$mergePages(users_pages, "user")
     },
     getForms = function(study_id) {
-      if (self$verbose) message("Getting all forms for study ", study_id)
+      if (self$verbose)
+        message("Getting all forms for study ", study_id)
       forms_pages <- self$getFormsPages(study_id)
 
       private$mergePages(forms_pages, "forms")
     },
     getFields = function(study_id, include = "optiongroup") {
-      if (self$verbose) message("Getting all fields for study ", study_id)
+      if (self$verbose)
+        message("Getting all fields for study ", study_id)
       fields_pages <- self$getFieldsPages(study_id, include = include)
 
-      private$mergePages(fields_pages, "fields")
+
+      fields <- private$mergePages(fields_pages, "fields")
+
+      if (!is.null(fields)) {
+        mutate(
+          fields,
+          field_variable_name = if_else(
+              is.na(field_variable_name) |
+              field_variable_name == "<NA>" |
+              field_variable_name == "",
+            field_id,
+            as.character(field_variable_name)
+          )
+        )
+      }
+      else {
+        fields
+      }
     },
     getVisits = function(study_id) {
       if (self$verbose) message("Getting all visits for study ", study_id)
@@ -555,24 +574,11 @@ CastorData <- R6::R6Class("CastorData",
       } else
         NULL
     },
-    getFieldInfo = function(study_id) {
-      fields <- self$getFields(study_id)
-      if (!is.null(fields))
-        mutate(fields,
-               field_variable_name = if_else(is.na(field_variable_name) |
-                                               field_variable_name == "<NA>" |
-                                               field_variable_name == "",
-                                             field_id,
-                                             as.character(field_variable_name))
-               )
-      else
-        NULL
-    },
     generateFieldMetadata = function(study_id, field_info) {
       forms <- self$getForms(study_id)
 
       if (missing(field_info) || is.null(field_info))
-        field_info <- self$getFieldInfo(study_id)
+        field_info <- self$getFields(study_id)
 
       if (!is.null(forms)) {
         fields_forms <- merge(forms[c("id", "form_order")],
@@ -667,7 +673,7 @@ CastorData <- R6::R6Class("CastorData",
 
       participant_metadata <- self$getParticipants(study_id)
       # Get field metadata for the given study to be used in adjustTypes.
-      field_info <- self$getFieldInfo(study_id)
+      field_info <- self$getFields(study_id)
 
       if (is.null(field_info))
         return(NULL)
@@ -877,7 +883,7 @@ CastorData <- R6::R6Class("CastorData",
       mutate_at(study_data, other_fields, as.character)
     },
     transformOptionGroups = function(dataframe, study_id) {
-      field_info <- self$getFieldInfo(study_id)
+      field_info <- self$getFields(study_id)
       option_group <- self$getOptionGroups(study_id)
       self$transformOptionGroupsInternal(dataframe, field_info, option_group)
     }
