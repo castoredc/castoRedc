@@ -4,7 +4,7 @@ castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, ba
 test_that("getField returns an appropriate object.", {
   field <- castor_api$getField(creds$output_study, creds$example_field)
 
-  expect_is(field, "list")
+  expect_type(field, "list")
   expect_equal(field$field_id, creds$example_field)
   expect_gt(length(field), 0)
 })
