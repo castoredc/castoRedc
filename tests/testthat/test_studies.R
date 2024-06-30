@@ -5,10 +5,10 @@ creds <- readRDS("testing_credentials.Rds")
 castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getStudy returns an appropriate object.", {
-  study <- castor_api$getStudy(creds$example_study)
+  study <- castor_api$getStudy(creds$output_study)
 
   expect_is(study, "list")
-  expect_equal(study$study_id, creds$example_study)
+  expect_equal(study$study_id, creds$output_study)
   expect_gt(length(study), 0)
 })
 
