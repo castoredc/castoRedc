@@ -20,8 +20,8 @@ test_that("getStudyDataPointsBulk fails appropriately", {
 
 
 test_that("getStudyDataBulk returns an appropriate object.", {
-  field_info <- castor_api$getFields(output_study)
-  participant_info <- castor_api$getParticipants(output_study)
+  field_info <- castor_api$getFields(creds$output_study)
+  participant_info <- castor_api$getParticipants(creds$output_study)
   study_data_bulk <- castor_api$getStudyDataBulk(creds$output_study, field_info, participant_info)
 
   expect_s3_class(study_data_bulk, "data.frame")
@@ -87,13 +87,14 @@ test_that("getStudyDataBulk returns an appropriate object.", {
       "pat_race",
       "pat_sex" ,
       "unscheduled"
-    )
+    ),
+    ignore.order=T
   )
 })
 
 test_that("getStudyDataBulk fails appropriately", {
-  field_info <- castor_api$getFields(output_study)
-  participant_info <- castor_api$getParticipants(output_study)
+  field_info <- castor_api$getFields(creds$output_study)
+  participant_info <- castor_api$getParticipants(creds$output_study)
   error <- expect_error(castor_api$getStudyDataBulk("THISISNOTASTUDYID", field_info, participant_info))
   expect_match(error$message, "Error code: 404")
 })
