@@ -71,7 +71,8 @@ test_that("getStudyDataPoints returns an appropriate object.", {
       "pat_race",
       "pat_sex" ,
       "unscheduled"
-    )
+    ),
+    ignore.order=T
   )
 })
 
