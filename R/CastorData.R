@@ -547,19 +547,27 @@ CastorData <- R6::R6Class("CastorData",
       return(study_data_points.df)
     },
     getStudyDataBulk = function(study_id, field_info=NULL, participant_metadata=NULL) {
+      # Extract the necessary info that wasnt given to the function
       if (is.null(field_info)) {self$getFields(study_id)}
       if (is.null(participant_metadata)) {self$getParticipants(study_id)}
+
+      # Extract all study data points in long format
+      # One row per datapoint
       study_data <- self$getStudyDataPointsBulk(study_id)
 
+      # If there is study data
       if (nrow(study_data) > 0) {
+        # Add the field names to the field ids and values in long format
         study_data <- left_join(select(study_data, -updated_on),
                                 select(field_info, c(field_variable_name, field_id)),
                                 by = "field_id")
 
+        # Move from long (each data point has a row) to wide format per participant
         study_data <- pivot_wider(select(study_data, -field_id),
                                   names_from = field_variable_name,
                                   values_from = field_value)
 
+        # Add participant metadata to the dataframe
         study_data <- left_join(
           select(
             participant_metadata,
@@ -578,9 +586,6 @@ CastorData <- R6::R6Class("CastorData",
           randomisation_datetime = randomized_on,
           institute = `_embedded.site.name`
         )
-
-        study_data
-
       } else {
         # If no study data, only return participant information
         study_data <-
