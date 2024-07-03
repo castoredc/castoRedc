@@ -546,7 +546,9 @@ CastorData <- R6::R6Class("CastorData",
 
       return(study_data_points.df)
     },
-    getStudyDataBulk = function(study_id, field_info, participant_metadata) {
+    getStudyDataBulk = function(study_id, field_info=NULL, participant_metadata=NULL) {
+      if (is.null(field_info)) {self$getFields(study_id)}
+      if (is.null(participant_metadata)) {self$getParticipants(study_id)}
       study_data <- self$getStudyDataPointsBulk(study_id)
 
       if (nrow(study_data) > 0) {
@@ -579,9 +581,23 @@ CastorData <- R6::R6Class("CastorData",
 
         study_data
 
-      } else
-        # TODO: hier verder, tests runnen nog niet, en bij 0 rows het hier verwerken ipv in getStudyDat
-        NULL
+      } else {
+        # If no study data, only return participant information
+        study_data <-
+          rename(select(
+            participant_metadata,
+            participant_id,
+            `_embedded.site.name`,
+            archived,
+            randomization_group_name,
+            randomized_on,
+          ),
+          randomisation_group = randomization_group_name,
+          randomisation_datetime = randomized_on,
+          institute = `_embedded.site.name`
+          )
+      }
+      study_data
     },
     generateFieldMetadata = function(study_id, field_info) {
       forms <- self$getForms(study_id)
@@ -702,10 +718,6 @@ CastorData <- R6::R6Class("CastorData",
           all_data_points.df <- bind_rows(study_data)
         }
       } else {
-        all_data_points.df <- NULL
-      }
-
-      if (is.null(all_data_points.df)) {
         all_data_points.df <- rename(
           select(
             participant_metadata,
