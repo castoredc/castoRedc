@@ -86,13 +86,10 @@ study <- castor_api$getStudyData(example_study_id)
 <tr>
 <td>
 
-|      | Participant_ID | Site_Abbreviation | Randomization_Group | Participant_Creation | ic_date    | ic_versions#Other | ic_versions#Main study CF | ic_main_version | ic_language#English | ic_language#Dutch |
-|:-----|:---------------|:------------------|:--------------------|:---------------------|:-----------|:------------------|:--------------------------|:----------------|:--------------------|:------------------|
-| 1    | 110001         | FGV               | NA                  | 2021-06-22 09:51:49  | 2021-06-22 | FALSE             | FALSE                     | 2.5             | FALSE               | FALSE             |
-| 2    | 110002         | FGV               | NA                  | 2021-06-22 09:59:01  | NA         | FALSE             | FALSE                     | NA              | FALSE               | FALSE             |
-| NA   | NA             | NA                | NA                  | NA                   | NA         | NA                | NA                        | NA              | NA                  | NA                |
-| NA.1 | NA             | NA                | NA                  | NA                   | NA         | NA                | NA                        | NA              | NA                  | NA                |
-| NA.2 | NA             | NA                | NA                  | NA                   | NA         | NA                | NA                        | NA              | NA                  | NA                |
+| Participant_ID | Site_Abbreviation | Randomization_Group | Participant_Creation | ic_date    | ic_versions#Other | ic_versions#Main study CF | ic_main_version | ic_language#English | ic_language#Dutch |
+|:---------------|:------------------|:--------------------|:---------------------|:-----------|:------------------|:--------------------------|:----------------|:--------------------|:------------------|
+| 110001         | FGV               | NA                  | 2021-06-22 09:51:49  | 2021-06-22 | FALSE             | TRUE                      | 2.5             | FALSE               | FALSE             |
+| 110002         | FGV               | NA                  | 2021-06-22 09:59:01  | NA         | FALSE             | FALSE                     | NA              | FALSE               | FALSE             |
 
 </td>
 <td>
