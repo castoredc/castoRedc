@@ -1,6 +1,6 @@
 Package: castoRedc
 Title: Wraps Castor API for easy data access
-Version: 2.0.0
+Version: 2.1.0
 Authors@R: c(
     person("Thomas", "Johnson", role = "aut"),
     person("Reinier", "van Linschoten",
@@ -20,7 +20,7 @@ Imports:
     httr,
     jsonlite,
     R6,
-    purrr,
+    purrr (>= 1.0.0),
     dplyr,
     tidyr,
     glue

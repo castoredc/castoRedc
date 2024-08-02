@@ -92,12 +92,12 @@ split_checkbox <- function(values, field_info, value_to_label, sep_ = ";") {
 
   field <- names(field_info)
 
-  checkbox_result <- rename_all(
+  checkbox_result <-
     mutate_all(
       bind_rows(
         lapply(values, function(value) {
           checkboxes <- as.data.frame(split(rep(TRUE, length(value)),
-                                            paste0(field, ".", value)))
+                                            paste0(field, "#", value)), check.names=F)
           if (nrow(checkboxes) > 0)
             checkboxes
           else
@@ -105,9 +105,7 @@ split_checkbox <- function(values, field_info, value_to_label, sep_ = ";") {
         })
       ),
       replace_na, FALSE
-    ),
-    ~gsub("[.]", "#", .)
-  )
+    )
 
   pad_fields <- setdiff(field_info[[field]], names(checkbox_result))
   empty_checkboxes <- bind_cols(

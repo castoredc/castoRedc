@@ -79,7 +79,7 @@ study <- castor_api$getStudyData(example_study_id)
 ```
 
 ```{r echo=FALSE, results='asis'}
-study[["Study"]] <- study[["Study"]][1:5,1:10]
+study[["Study"]] <- study[["Study"]][,1:10]
 study[["Repeating data"]] <-
   lapply(study[["Repeating data"]], function(x)
     x %>%
