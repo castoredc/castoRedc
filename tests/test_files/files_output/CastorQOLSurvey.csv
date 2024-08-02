@@ -1,0 +1,3 @@
+participant_id,institute,survey_name,survey_instance_id,created_on,sent_on,progress,completed_on,package_id,package_name,archived,SF12_1,SF12_2,SF12_3,SF12_12,VAS
+110001,Franciscus Gasthuis & Vlietland,QOL Survey,4FF130AD-274C-4C8F-A4A0-A7816A5A88E9,22-06-2021 10:12:19,22-06-2021 10:12:19,100,22-06-2021 10:12:44,0761A9BA-9802-483D-8EB3-D07233A56F2B,My first survey package,FALSE,Excellent,Mostly,Mostly,Rarely,85
+110001,Franciscus Gasthuis & Vlietland,QOL Survey,B99F0082-1B20-456B-8D4D-47D16867B211,22-06-2021 10:13:01,22-06-2021 10:13:01,0,,5B3FE56F-89FA-4C6D-A638-E8FA46113EB0,My first survey package,FALSE,,,,,

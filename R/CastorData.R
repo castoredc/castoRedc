@@ -498,15 +498,19 @@ CastorData <- R6::R6Class("CastorData",
                 "returning data frame with just participant metadata.")
 
         empty.df <- data.frame(
-          "Site Abbreviation" =
-            participant_metadata[["_embedded"]][["site"]][["abbreviation"]],
-          "Randomization Group" =
-            ifelse(is.null(participant_metadata[["randomization_group"]]), NA,
-                   participant_metadata[["randomization_group"]]),
-          "Participant Creation" = participant_metadata[["created_on"]][["date"]],
-          "Participant_ID" = participant_id
+          "institute" =
+            participant_metadata[["_embedded"]][["site"]][["name"]],
+          "randomisation_group" =
+            ifelse(is.null(participant_metadata[["randomization_group_name"]]),
+                   NA,
+                   participant_metadata[["randomization_group_name"]]),
+          "participant_id" = participant_id,
+          "archived" = participant_metadata[["archived"]],
+          "randomisation_datetime" =
+            ifelse(is.null(participant_metadata[["randomizated_on"]]),
+                   NA,
+                   participant_metadata[["randomizated_on"]])
         )
-
         return(empty.df)
       }
       # Filter out any field types that are specified in the filter_types
@@ -524,55 +528,81 @@ CastorData <- R6::R6Class("CastorData",
         stringsAsFactors = FALSE)
 
       # Add the participant id as a column to the data.
-      study_data_points.df[["Participant_ID"]] <- participant_id
+      study_data_points.df[["participant_id"]] <- participant_id
 
       # Randomization ID should be in participant data.
-      study_data_points.df[["Site_Abbreviation"]] <-
-        participant_metadata[["_embedded"]][["site"]][["abbreviation"]]
-      study_data_points.df[["Randomization_Group"]] <-
-        ifelse(is.null(participant_metadata[["randomization_group"]]),
+      study_data_points.df[["institute"]] <-
+        participant_metadata[["_embedded"]][["site"]][["name"]]
+      study_data_points.df[["archived"]] <-
+        participant_metadata[["archived"]]
+      study_data_points.df[["randomisation_group"]] <-
+        ifelse(is.null(participant_metadata[["randomization_group_name"]]),
                NA,
-               participant_metadata[["randomization_group"]])
-      study_data_points.df[["Participant_Creation"]] <-
-        participant_metadata[["created_on"]][["date"]]
+               participant_metadata[["randomization_group_name"]])
+      study_data_points.df[["randomisation_datetime"]] <-
+        ifelse(is.null(participant_metadata[["randomizated_on"]]),
+               NA,
+               participant_metadata[["randomizated_on"]])
 
       return(study_data_points.df)
     },
-    getStudyDataBulk = function(study_id., field_info., participant_metadata) {
-      study_data <- self$getStudyDataPointsBulk(study_id.)
-      if (isTRUE(nrow(study_data) > 0)) {
-        study_data_field_info <- distinct(left_join(study_data, field_info., by = "field_id"))
-        study_data_long <- select(study_data_field_info,
-                                  field_variable_name, participant_id, field_value)
-        study_data_wide <- spread(study_data_long,
-                                  field_variable_name, field_value)
-        study_data_complete_cases <- filter_all(study_data_wide,
-                                                 any_vars(!is.na(.)))
+    getStudyDataBulk = function(study_id, field_info=NULL, participant_metadata=NULL) {
+      # Extract the necessary info that wasnt given to the function
+      if (is.null(field_info)) {self$getFields(study_id)}
+      if (is.null(participant_metadata)) {self$getParticipants(study_id)}
 
-        # Add randomized on date for studies without randomization
-        # Is not retrieved from API, but needs to exist for further steps
-        if (!("randomized_on.date" %in% names(participant_metadata))) {
-          participant_metadata <- participant_metadata %>%
-            mutate(randomized_on.date = NA_character_)
-        }
+      # Extract all study data points in long format
+      # One row per datapoint
+      study_data <- self$getStudyDataPointsBulk(study_id)
 
-        rename(
-          left_join(
-            select(
-              participant_metadata,
-              participant_id,
-              Randomization_Group = randomization_group,
-              Randomization_Group_Name = randomization_group_name,
-              Randomized_On = randomized_on.date,
-              Site_Abbreviation = `_embedded.site.abbreviation`,
-              Participant_Creation = created_on.date),
-            study_data_complete_cases,
-            by="participant_id"
+      # If there is study data
+      if (nrow(study_data) > 0) {
+        # Add the field names to the field ids and values in long format
+        study_data <- left_join(select(study_data, -updated_on),
+                                select(field_info, c(field_variable_name, field_id)),
+                                by = "field_id")
+
+        # Move from long (each data point has a row) to wide format per participant
+        study_data <- pivot_wider(select(study_data, -field_id),
+                                  names_from = field_variable_name,
+                                  values_from = field_value)
+
+        # Add participant metadata to the dataframe
+        study_data <- left_join(
+          select(
+            participant_metadata,
+            participant_id,
+            `_embedded.site.name`,
+            archived,
+            randomization_group_name,
+            randomized_on,
           ),
-          Participant_ID = participant_id
+          study_data,
+          by = "participant_id"
         )
-      } else
-        NULL
+
+        study_data <- rename(study_data,
+          randomisation_group = randomization_group_name,
+          randomisation_datetime = randomized_on,
+          institute = `_embedded.site.name`
+        )
+      } else {
+        # If no study data, only return participant information
+        study_data <-
+          rename(select(
+            participant_metadata,
+            participant_id,
+            `_embedded.site.name`,
+            archived,
+            randomization_group_name,
+            randomized_on,
+          ),
+          randomisation_group = randomization_group_name,
+          randomisation_datetime = randomized_on,
+          institute = `_embedded.site.name`
+          )
+      }
+      study_data
     },
     generateFieldMetadata = function(study_id, field_info) {
       forms <- self$getForms(study_id)
@@ -683,8 +713,8 @@ CastorData <- R6::R6Class("CastorData",
           all_data_points.df <- self$getStudyDataBulk(study_id, field_info,
                                                       participant_metadata)
         } else {
-          # Get study data from getStudyDataPoints and collect them by participant in a
-          # list.
+          # Get study data from getStudyDataPoints
+          # Collect them by participant in a list
           study_data <- lapply(participant_metadata$participant_id, function(participant) {
             if (self$verbose) message("getting participant ", participant)
             return(self$getStudyDataPoints(study_id, participant, filter_types))
@@ -693,10 +723,6 @@ CastorData <- R6::R6Class("CastorData",
           all_data_points.df <- bind_rows(study_data)
         }
       } else {
-        all_data_points.df <- NULL
-      }
-
-      if (is.null(all_data_points.df)) {
         all_data_points.df <- rename(
           select(
             participant_metadata,
