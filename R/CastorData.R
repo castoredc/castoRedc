@@ -302,7 +302,7 @@ CastorData <- R6::R6Class("CastorData",
           names_from = field_id, values_from = field_value),
         Participant_ID = participant_id,
         repeating_data_inst_name = repeating_data_instance_name) %>%
-        dplyr::select(!`NA`)
+        dplyr::select(!any_of("NA"))
 
 
 
