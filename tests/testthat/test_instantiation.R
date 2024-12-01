@@ -1,3 +1,4 @@
+# TODO: Needs updates to tests
 context("Test instantiation and authentication.")
 
 test_that("Castor object instantiation produces valid R6 class object.", {

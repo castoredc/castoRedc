@@ -1,10 +1,11 @@
+# TODO: Needs updates to tests
 context("Test StudyDataPoint related methods.")
 
 creds <- readRDS("testing_credentials.Rds")
 castor_api <- CastorData$new(key=creds$client_id, secret=creds$client_secret, base_url=creds$base_url)
 
 test_that("getStudyDataPoint returns an appropriate object.", {
-  sdp <- castor_api$getStudyDataPoint(creds$example_study,
+  sdp <- castor_api$getStudyDataPoint(creds$output_study,
                                       creds$example_participant,
                                       creds$example_field)
 
@@ -15,28 +16,28 @@ test_that("getStudyDataPoint returns an appropriate object.", {
 })
 
 test_that("getStudyDataPointsPages returns an appropriate object.", {
-  sdps <- castor_api$getStudyDataPointsPages(creds$example_study,
+  sdps <- castor_api$getStudyDataPointsPages(creds$output_study,
                                              creds$example_participant)
-  one_sdp <- castor_api$getStudyDataPointsPages(creds$example_study,
+  one_sdp <- castor_api$getStudyDataPointsPages(creds$output_study,
                                                 creds$example_participant,
                                                 page = 1)
 
   expect_is(sdps, "list")
   expect_is(one_sdp, "list")
   expect_true(length(one_sdp) == 1)
-  expect_error(castor_api$getStudyDataPointsPages(creds$example_study,
+  expect_error(castor_api$getStudyDataPointsPages(creds$output_study,
                                                   creds$example_participant,
                                                   page = -1))
-  expect_error(castor_api$getStudyDataPointsPages(creds$example_study,
+  expect_error(castor_api$getStudyDataPointsPages(creds$output_study,
                                                   creds$example_participant,
                                                   page = 100000000))
-  expect_error(castor_api$getStudyDataPointsPages(creds$example_study,
+  expect_error(castor_api$getStudyDataPointsPages(creds$output_study,
                                                   creds$example_participant,
                                                   page = pi))
 })
 
 test_that("getStudyDataPoints returns an appropriate object.", {
-  sdp_data <- castor_api$getStudyDataPoints(creds$example_study,
+  sdp_data <- castor_api$getStudyDataPoints(creds$output_study,
                                             creds$example_participant,
                                             filter_types = creds$filter_vals)
 
